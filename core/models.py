@@ -96,3 +96,19 @@ class LogError(models.Model):
     mensaje = models.TextField()
     stack_trace = models.TextField()
     fecha = models.DateTimeField(auto_now_add=True)
+
+class Pedido(models.Model):
+    comprador = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha = models.DateTimeField(auto_now_add=True)
+    total = models.FloatField()
+    metodo_pago = models.CharField(max_length=20)
+    estado = models.CharField(max_length=20, default='PENDIENTE')
+
+    def __str__(self):
+        return f"Pedido {self.id} - {self.comprador.username}"
+
+class PedidoItem(models.Model):
+    pedido = models.ForeignKey(Pedido, related_name='items', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    cantidad = models.IntegerField()
+    precio_unitario = models.FloatField()

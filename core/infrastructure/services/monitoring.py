@@ -3,13 +3,11 @@ from ...models import Auditoria, LogError
 
 class AuditService:
     @staticmethod
-    def log_action(user_id: int, accion: str, tabla: str, registro_id: int, detalle: str):
+    def log_action(user_id: int, accion: str, detalles: str):
         Auditoria.objects.create(
             usuario_id=user_id,
             accion=accion,
-            tabla_afectada=tabla,
-            registro_id=registro_id,
-            detalle=detalle
+            detalles=detalles
         )
 
     @staticmethod
@@ -24,11 +22,12 @@ class BAMService:
     @staticmethod
     def get_kpis():
         from ...models import Pedido as PedidoModel, Vendedor as VendedorModel
-        from django.db.models import Sum, Count, Avg
+        from django.db.models import Sum, Avg
         
+        ventas = PedidoModel.objects.filter(estado="PAGADO")
         return {
-            "ventas_totales": PedidoModel.objects.filter(estado="PAGADO").aggregate(Sum('total'))['total__sum'] or 0,
-            "cantidad_pedidos": PedidoModel.objects.filter(estado="PAGADO").count(),
+            "ventas_totales": ventas.aggregate(Sum('total'))['total__sum'] or 0,
+            "cantidad_pedidos": ventas.count(),
             "vendedores_activos": VendedorModel.objects.count(),
-            "ticket_promedio": PedidoModel.objects.filter(estado="PAGADO").aggregate(Avg('total'))['total__avg'] or 0
+            "ticket_promedio": ventas.aggregate(Avg('total'))['total__avg'] or 0
         }

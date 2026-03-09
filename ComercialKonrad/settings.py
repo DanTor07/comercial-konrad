@@ -51,9 +51,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.infrastructure.middleware.audit_middleware.AuditMiddleware',
 ]
 
-ROOT_URLCONF = 'PQRS_Sistem.urls'
+ROOT_URLCONF = 'ComercialKonrad.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'PQRS_Sistem.wsgi.application'
+WSGI_APPLICATION = 'ComercialKonrad.wsgi.application'
 
 
 # Database
@@ -145,3 +146,25 @@ EMAIL_USE_TLS = True                 # Usar TLS
 EMAIL_HOST_USER = 'supermarketpqrs7@gmail.com'    # Tu correo Gmail
 EMAIL_HOST_PASSWORD = 'bqys vvqa msyd qqth'  # Contraseña de aplicación
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'audit.log'),
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'audit': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
