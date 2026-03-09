@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Vendedor - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .form-container { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
+        h1 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        input { width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+        .btn-submit:hover { opacity: 0.9; }
+        .back-link { display: block; text-align: center; margin-top: 1.5rem; color: #6B7280; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Únete como Vendedor</h1>
+        <form method="POST">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn-submit">Enviar Solicitud</button>
+        </form>
+        <a href="{% url 'inicio' %}" class="back-link">← Volver al inicio</a>
+    </div>
+</body>
+</html>

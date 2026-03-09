@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu Carrito - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; }
+        nav { background: white; padding: 1rem 5%; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .container { padding: 40px 5%; max-width: 800px; margin: auto; }
+        .cart-item { background: white; padding: 20px; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .btn-checkout { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1.1rem; }
+        .total-section { padding: 20px; background: white; border-radius: 12px; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'inicio' %}" style="font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none;">Comercial Konrad</a>
+    </nav>
+    <div class="container">
+        <h1>Tu Carrito</h1>
+        {% for item in cart.items %}
+        <div class="cart-item">
+            <div>
+                <h3>Producto ID: {{ item.producto_id }}</h3>
+                <p>Cantidad: {{ item.cantidad }}</p>
+            </div>
+            <div style="font-weight: 700; color: var(--primary);">
+                ${{ item.precio_unitario }}
+            </div>
+        </div>
+        {% empty %}
+        <p>Tu carrito está vacío.</p>
+        {% endfor %}
+        
+        {% if cart.items %}
+        <div class="total-section">
+            <button class="btn-checkout">Proceder al Pago</button>
+        </div>
+        {% endif %}
+        <p style="text-align: center; margin-top: 2rem;"><a href="{% url 'catalog' %}" style="color: var(--primary);">Seguir comprando</a></p>
+    </div>
+</body>
+</html>

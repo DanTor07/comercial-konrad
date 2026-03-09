@@ -1,0 +1,160 @@
+/* Estilos generales para el fondo y cuerpo */
+body {
+    background-image: url("../../img/recovery_password.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Contenedor del formulario de restablecimiento de contraseña */
+.form-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    max-width: 500px;
+    margin: 5% auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo del encabezado */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilos para las etiquetas del formulario */
+form label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Estilos para los campos de entrada */
+form input[type="email"],
+form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* Estilos para el botón de enviar */
+button[type="submit"] {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #1d4ed8;
+}
+
+/* Estilos para los mensajes de error */
+.error {
+    color: red;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Estilos para los mensajes de éxito */
+.success {
+    color: green;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Estilo para el botón de volver */
+.btn-volver {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: mediumpurple;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-volver:hover {
+    background-color: rebeccapurple;
+}
+
+/* Estilos para el campo de la contraseña con el ojo de mostrar/ocultar */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 35px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+/* Estilos para el icono de mostrar/ocultar contraseña */
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: black;
+    user-select: none;
+}
+
+.toggle-password i {
+    pointer-events: none;
+}
+
+/* Estilos para el modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Contenido del modal */
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+/* Estilo para el botón de cerrar del modal */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #aaa;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}

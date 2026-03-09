@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supermarket | Sistema PQRS</title>
+    <link rel="stylesheet" href="{% static 'css/principales/home_usuarios.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Sección izquierda - Carrusel de imágenes -->
+        <div class="carousel-container">
+            <div class="carousel-slide">
+                <img src="{% static 'img/apples.jpg' %}" alt="Imagen 1" class="carousel-image active">
+                <img src="{% static 'img/business.jpg' %}" alt="Imagen 2" class="carousel-image">
+                <img src="{% static 'img/supermarket.jpg' %}" alt="Imagen 3" class="carousel-image">
+            </div>
+            <div class="carousel-controls">f
+                <button class="carousel-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+                <div class="carousel-indicators">
+                    <span class="indicator active"></span>
+                    <span class="indicator"></span>
+                    <span class="indicator"></span>
+                </div>
+                <button class="carousel-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+
+        <!-- Sección derecha - Información del cliente -->
+        <div class="dashboard-container">
+            <div class="user-header">
+                <h1 class="titulo-dashboard">Bienvenido, <span class="username">{{ usuario }}</span></h1>
+                <p class="descripcion-dashboard">Desde aquí podrás gestionar tus PQRS de manera sencilla</p>
+            </div>
+
+            <div class="user-actions">
+                <a href="{% url 'crear_pqrs' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Crear PQRS
+                </a>
+                <a href="{% url 'listar_pqrs' %}" class="btn btn-primary">
+                    <i class="fas fa-list-ul"></i> Ver mis PQRS
+                </a>
+                <a href="{% url 'cambiar_contrasena' %}" class="btn btn-primary">
+                    <i class="fas fa-key"></i> Cambiar contraseña
+                </a>
+                <a href="{% url 'cerrar_sesion' %}" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </div>
+
+            <div class="user-stats">
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>PQRS Activas</h3>
+                    <p class="stat-value">5</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>PQRS Resueltas</h3>
+                    <p class="stat-value">12</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/principales.js' %}"></script>
+</body>
+</html>

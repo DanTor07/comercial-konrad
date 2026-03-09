@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión PQRS | Supermarket</title>
+    <link rel="stylesheet" href="{% static 'css/gestor/gestion_pqrs.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="pqrs-container">
+        <!-- Header con título del sistema -->
+        <header class="pqrs-header">
+            <h1><i class="fas fa-tasks"></i> Supermarket - Sistema PQRS</h1>
+        </header>
+
+        <!-- Contenido principal -->
+        <main class="pqrs-content">
+            <div class="user-welcome">
+                <h2>Bienvenido, <span class="username">{{ usuario }}</span></h2>
+                <p>Gestiona las solicitudes de los clientes desde esta interfaz</p>
+            </div>
+
+            <!-- Formulario de filtrado -->
+            <form method="get" class="filter-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        {{ form.numero_radicado.label_tag }}
+                        {{ form.numero_radicado }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.tipo_radicado.label_tag }}
+                        {{ form.tipo_radicado }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.estado.label_tag }}
+                        {{ form.estado }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.fecha_inicio.label_tag }}
+                        {{ form.fecha_inicio }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.fecha_fin.label_tag }}
+                        {{ form.fecha_fin }}
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-filter">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <a href="{% url 'gestion_pqrs' %}" class="btn btn-clear">
+                        <i class="fas fa-broom"></i> Limpiar
+                    </a>
+                    <button type="submit" name="exportar_pdf" value="1" class="btn btn-export">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+            </form>
+            <!-- Tabla de resultados -->
+            <div class="pqrs-table-container">
+                <table class="pqrs-table">
+                    <thead>
+                        <tr>
+                            <th>Número Radicado</th>
+                            <th>Fecha</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Cliente</th>
+                            <th>Comentarios</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pqrs in page_obj %}
+                        <tr>
+                            <td data-label="Número Radicado">{{ pqrs.numero_radicado }}</td>
+                            <td data-label="Fecha">{{ pqrs.fecha_radicado|date:"Y-m-d H:i" }}</td>
+                            <td data-label="Tipo">
+                                <span class="badge badge-{{ pqrs.tipo_radicado|lower }}">
+                                    {{ pqrs.tipo_radicado }}
+                                </span>
+                            </td>
+                            <td data-label="Estado">
+                                <span class="status-badge badge-{{ pqrs.estado|slugify }}">{{ pqrs.get_estado_display }}</span>
+                            </td>
+                            <td data-label="Cliente">{{ pqrs.cliente.nombre_completo }}</td>
+                            <td data-label="Comentarios">{{ pqrs.comentarios|truncatechars:50 }}</td>
+                            <td data-label="Acciones">
+                                <a href="{% url 'detalle_pqrs_gestor' pqrs.numero_radicado %}" class="btn-action btn-view">
+                                    <i class="fas fa-eye"></i> <span class="action-text">Detalles</span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="no-results">
+                                <i class="fas fa-info-circle"></i> No se encontraron resultados.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Controles de paginación -->
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1{% if request.GET.numero_radicado %}&numero_radicado={{ request.GET.numero_radicado }}{% endif %}{% if request.GET.tipo_radicado %}&tipo_radicado={{ request.GET.tipo_radicado }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.fecha_inicio %}&fecha_inicio={{ request.GET.fecha_inicio }}{% endif %}{% if request.GET.fecha_fin %}&fecha_fin={{ request.GET.fecha_fin }}{% endif %}" class="btn-pagination">&laquo; Primera</a>
+                            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.numero_radicado %}&numero_radicado={{ request.GET.numero_radicado }}{% endif %}{% if request.GET.tipo_radicado %}&tipo_radicado={{ request.GET.tipo_radicado }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.fecha_inicio %}&fecha_inicio={{ request.GET.fecha_inicio }}{% endif %}{% if request.GET.fecha_fin %}&fecha_fin={{ request.GET.fecha_fin }}{% endif %}" class="btn-pagination">Anterior</a>
+                        {% endif %}
+
+                        <span class="current">
+                            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                        </span>
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.numero_radicado %}&numero_radicado={{ request.GET.numero_radicado }}{% endif %}{% if request.GET.tipo_radicado %}&tipo_radicado={{ request.GET.tipo_radicado }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.fecha_inicio %}&fecha_inicio={{ request.GET.fecha_inicio }}{% endif %}{% if request.GET.fecha_fin %}&fecha_fin={{ request.GET.fecha_fin }}{% endif %}" class="btn-pagination">Siguiente</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.numero_radicado %}&numero_radicado={{ request.GET.numero_radicado }}{% endif %}{% if request.GET.tipo_radicado %}&tipo_radicado={{ request.GET.tipo_radicado }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.fecha_inicio %}&fecha_inicio={{ request.GET.fecha_inicio }}{% endif %}{% if request.GET.fecha_fin %}&fecha_fin={{ request.GET.fecha_fin }}{% endif %}" class="btn-pagination">Última &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <a href="{% url 'vista_gestor' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Volver al panel
+                </a>
+                <a href="{% url 'cerrar_sesion' %}" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="pqrs-footer">
+            <p>&copy; 2025 Supermarket - Sistema PQRS. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+</body>
+</html>

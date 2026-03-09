@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--light); padding: 40px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 16px; }
+        .method-card { border: 2px solid #E5E7EB; border-radius: 12px; padding: 15px; margin-bottom: 1rem; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .method-card:hover { border-color: var(--primary); }
+        .btn-pay { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Finalizar Compra</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <h3>Selecciona tu método de pago:</h3>
+            <label class="method-card">
+                <input type="radio" name="metodo_pago" value="LINEA" required>
+                <span>Pago en Línea (PSE)</span>
+            </label>
+            <label class="method-card">
+                <input type="radio" name="metodo_pago" value="TARJETA">
+                <span>Tarjeta de Crédito</span>
+            </label>
+            <label class="method-card">
+                <input type="radio" name="metodo_pago" value="CONSIGNACION">
+                <span>Consignación Bancaria</span>
+            </label>
+            <button type="submit" class="btn-pay">Pagar Ahora</button>
+        </form>
+    </div>
+</body>
+</html>

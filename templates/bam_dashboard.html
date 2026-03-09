@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard BAM - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
+        body { font-family: 'Outfit', sans-serif; background: var(--light); padding: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; }
+        .card h3 { margin: 0; color: #6B7280; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card .value { font-size: 2rem; font-weight: 700; color: var(--dark); margin: 10px 0; }
+        .card .trend { font-size: 0.8rem; color: #10B981; }
+    </style>
+</head>
+<body>
+    <h1>Business Activity Monitoring (BAM)</h1>
+    <p>Indicadores clave de desempeño en tiempo real.</p>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>Ventas Totales</h3>
+            <div class="value">${{ kpis.ventas_totales }}</div>
+            <div class="trend">↑ 12% vs mes anterior</div>
+        </div>
+        <div class="card">
+            <h3>Pedidos Completados</h3>
+            <div class="value">{{ kpis.cantidad_pedidos }}</div>
+            <div class="trend">↑ 5% vs mes anterior</div>
+        </div>
+        <div class="card">
+            <h3>Vendedores Activos</h3>
+            <div class="value">{{ kpis.vendedores_activos }}</div>
+            <div class="trend">Nuevo récord</div>
+        </div>
+        <div class="card">
+            <h3>Ticket Promedio</h3>
+            <div class="value">${{ kpis.ticket_promedio|floatformat:2 }}</div>
+            <div class="trend">Estable</div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 3rem; background: white; padding: 20px; border-radius: 16px;">
+        <h3>Últimas Auditorías de Seguridad</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 2px solid #F3F4F6; text-align: left;">
+                <th style="padding: 10px;">Fecha</th>
+                <th>Acción</th>
+                <th>Usuario</th>
+                <th>Detalle</th>
+            </tr>
+            {% for audit in auditorias %}
+            <tr style="border-bottom: 1px solid #F3F4F6;">
+                <td style="padding: 10px;">{{ audit.fecha }}</td>
+                <td>{{ audit.accion }}</td>
+                <td>{{ audit.usuario_id }}</td>
+                <td>{{ audit.detalle }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

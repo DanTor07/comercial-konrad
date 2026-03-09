@@ -1,0 +1,93 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Restablecer Contraseña</title>
+    <link rel="stylesheet" href="{% static 'css/contrasena/restablecer_contrasena.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Restablecer Contraseña</h2>
+        <form method="POST">
+              <!-- Mostrar errores del formulario -->
+        {% if form.errors %}
+            <ul class="errorlist">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+            {% csrf_token %}
+
+            <label>Nueva contraseña:</label>
+            <div class="password-wrapper">
+                <input type="password" name="nueva_contrasena" id="id_contrasena" required>
+                <span class="toggle-password" id="toggle-password" onclick="togglePassword()">
+                    <i id="password-icon" class="fas fa-eye"></i>
+                </span>
+            </div>
+
+            <label>Confirmar contraseña:</label>
+            <div class="password-wrapper">
+                <input type="password" name="confirmar_contrasena" id="id_confirmar_contrasena" required>
+                <span class="toggle-password" id="toggle-password-confirm" onclick="togglePasswordConfirm()">
+                    <i id="password-icon-confirm" class="fas fa-eye"></i>
+                </span>
+            </div>
+
+            <button type="submit">Restablecer</button>
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+            <p class="success">{{ success }}</p>
+        {% endif %}
+
+        <a href="{% url 'iniciar_sesion' %}" class="btn-volver">Volver al inicio</a>
+    </div>
+
+    <script>
+        function togglePassword() {
+            var passwordField = document.getElementById('id_contrasena');
+            var passwordIcon = document.getElementById('password-icon');
+
+            // Cambia el tipo del campo de password
+            if (passwordField.type === "password") {
+                passwordField.type = "text";  // Mostrar la contraseña
+                passwordIcon.classList.remove('fa-eye');  // Cambiar el icono
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = "password";  // Ocultar la contraseña
+                passwordIcon.classList.remove('fa-eye-slash');  // Cambiar el icono
+                passwordIcon.classList.add('fa-eye');
+            }
+        }
+
+        function togglePasswordConfirm() {
+            var passwordField = document.getElementById('id_confirmar_contrasena');
+            var passwordIcon = document.getElementById('password-icon-confirm');
+
+            // Cambia el tipo del campo de password
+            if (passwordField.type === "password") {
+                passwordField.type = "text";  // Mostrar la contraseña
+                passwordIcon.classList.remove('fa-eye');  // Cambiar el icono
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = "password";  // Ocultar la contraseña
+                passwordIcon.classList.remove('fa-eye-slash');  // Cambiar el icono
+                passwordIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

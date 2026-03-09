@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Supermarket - Sistema PQRS{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base/styles.css' %}">
+    {% block extra_css %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/registrar/registrar.css' %}">
+        <link rel="stylesheet" href="{% static 'css/pqrs/pqrs.css' %}">
+        <link rel="stylesheet" href="{% static 'css/errores/errores.css' %}">
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <h1>Supermarket - Sistema PQRS</h1>
+    </header>
+
+    <!-- Carrusel de fotos -->
+    <div class="carousel">
+        <div class="carousel-item active" style="background-image: url('https://www.uao.edu.co/wp-content/uploads/2021/05/SLIDE.jpg');"></div>
+        <div class="carousel-item" style="background-image: url('https://media.licdn.com/dms/image/v2/D4D12AQEUz1c-ZdwRTg/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1705085380090?e=2147483647&v=beta&t=S0aDuZoGBgGBBSc-qS94Cf3C6ksD0dzldYwbe3NkvZE');"></div>
+        <div class="carousel-item" style="background-image: url('https://media.licdn.com/dms/image/v2/D4D12AQEdVW-9wYShrg/article-cover_image-shrink_600_2000/article-cover_image-shrink_600_2000/0/1714050173696?e=2147483647&v=beta&t=Tjb1YrSkIJJWPz7qruQmC2Fm9UOxzKsRZx0LWcQUWAo');"></div>
+    </div>
+
+    <!-- Contenido centrado sobre el carrusel -->
+    <div class="overlay-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Supermarket - Sistema PQRS. Todos los derechos reservados. </p>
+    </footer>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>

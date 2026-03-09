@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Director - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; }
+        .header { background: white; padding: 1.5rem 5%; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .main { padding: 40px 5%; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #F3F4F6; }
+        th { background-color: #F9FAFB; font-weight: 600; color: #374151; }
+        .badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 500; }
+        .badge-pending { background-color: #FEF3C7; color: #92400E; }
+        .action-form { display: flex; gap: 0.5rem; }
+        select, input { padding: 6px; border-radius: 4px; border: 1px solid #D1D5DB; }
+        button { padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dashboard del Director</h1>
+    </div>
+    <div class="main">
+        <h2>Solicitudes Pendientes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombres</th>
+                    <th>Identificación</th>
+                    <th>Correo</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in solicitudes %}
+                <tr>
+                    <td>{{ s.id }}</td>
+                    <td>{{ s.nombres }} {{ s.apellidos }}</td>
+                    <td>{{ s.numero_identificacion }}</td>
+                    <td>{{ s.correo_electronico }}</td>
+                    <td><span class="badge badge-pending">{{ s.estado }}</span></td>
+                    <td>
+                        <form action="{% url 'procesar_solicitud' s.id %}" method="POST" class="action-form">
+                            {% csrf_token %}
+                            <select name="decision">
+                                <option value="APROBADA">Aprobar</option>
+                                <option value="RECHAZADA">Rechazar</option>
+                                <option value="DEVUELTA">Devolver</option>
+                            </select>
+                            <input type="text" name="comentarios" placeholder="Notas...">
+                            <button type="submit">Procesar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No hay solicitudes pendientes.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p style="margin-top: 2rem;"><a href="{% url 'inicio' %}" style="color: var(--primary);">← Volver al inicio</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; }
+        nav { background: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .container { padding: 40px 5%; display: grid; grid-template-columns: 250px 1fr; gap: 2rem; }
+        .filters { background: white; padding: 20px; border-radius: 12px; height: fit-content; }
+        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+        .product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.3s; }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-img { height: 200px; background-color: #E5E7EB; display: flex; align-items: center; justify-content: center; color: #9CA3AF; }
+        .product-info { padding: 1rem; }
+        .product-info h3 { margin: 0; font-size: 1.1rem; color: var(--dark); }
+        .product-price { font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0.5rem 0; }
+        .btn-add { width: 100%; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .search-bar { margin-bottom: 2rem; width: 100%; display: flex; gap: 1rem; }
+        .search-bar input { flex: 1; padding: 10px; border: 1px solid #D1D5DB; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'inicio' %}" class="logo">Comercial Konrad</a>
+        <div>
+            <a href="#" style="text-decoration: none; color: var(--dark);">Carrito (0)</a>
+        </div>
+    </nav>
+    <div class="container">
+        <aside class="filters">
+            <h3>Categorías</h3>
+            <ul style="list-style: none; padding: 0;">
+                {% for cat in categorias %}
+                    <li><a href="?categoria={{ cat.id }}" style="text-decoration: none; color: #4B5563;">{{ cat.nombre }}</a></li>
+                {% endfor %}
+            </ul>
+        </aside>
+        <main>
+            <form class="search-bar">
+                <input type="text" name="q" placeholder="Buscar productos..." value="{{ request.GET.q }}">
+                <button type="submit" class="btn-add" style="width: auto; padding: 0 20px;">Buscar</button>
+            </form>
+            <div class="catalog">
+                {% for product in productos %}
+                <div class="product-card">
+                    <div class="product-img">
+                        {% if product.imagenes %}
+                            <img src="{{ product.imagenes.0 }}" alt="{{ product.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            Sin Imagen
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3>{{ product.nombre }}</h3>
+                        <p style="color: #6B7280; font-size: 0.9rem;">{{ product.marca }}</p>
+                        <div class="product-price">${{ product.valor_unitario }}</div>
+                        <button class="btn-add">Añadir al Carrito</button>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No se encontraron productos.</p>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>

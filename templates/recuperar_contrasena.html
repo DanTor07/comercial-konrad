@@ -1,0 +1,31 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Contraseña</title>
+    <link rel="stylesheet" href="{% static 'css/contrasena/recuperar_contrasena.css' %}">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Recuperar Contraseña</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="correo">Ingresa tu correo electrónico:</label>
+            <input type="email" name="correo" id="correo" required>
+            <button type="submit">Enviar enlace de recuperación</button>
+        </form>
+
+        {% if success %}
+            <div class="alert alert-success">{{ success }}</div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <a href="{% url 'iniciar_sesion' %}" class="btn-volver">Volver al inicio</a>
+    </div>
+</body>
+</html>

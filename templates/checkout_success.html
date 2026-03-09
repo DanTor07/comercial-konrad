@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Compra Exitosa - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --success: #10B981; }
+        body { font-family: 'Outfit', sans-serif; text-align: center; padding: 100px 5%; background: #F9FAFB; }
+        .card { max-width: 500px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .icon { font-size: 4rem; color: var(--success); margin-bottom: 20px; }
+        .btn-home { display: inline-block; padding: 12px 30px; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">✓</div>
+        <h1>¡Pago Exitoso!</h1>
+        <p>Tu pedido ha sido procesado correctamente.</p>
+        <p><strong>Total pagado: ${{ pedido.total }}</strong></p>
+        <p>Método: {{ pedido.metodo_pago.value }}</p>
+        <a href="{% url 'catalog' %}" class="btn-home">Volver al Catálogo</a>
+    </div>
+</body>
+</html>

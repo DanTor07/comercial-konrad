@@ -1,0 +1,114 @@
+/* Estilos generales para el contenedor del formulario */
+.container {
+    display: flex;
+    justify-content: center;  /* Centra el formulario horizontalmente */
+    align-items: center;      /* Centra el formulario verticalmente */
+    height: 100vh;            /* Ocupa el 100% de la altura de la ventana */
+    padding: 20px;
+    background-color: transparent; /* Fondo transparente */
+    z-index: 1;               /* Asegura que el formulario esté encima del carrusel */
+}
+
+/* Estilo para el formulario */
+form {
+    width: 100%;
+    max-width: 700px;  /* Maximo ancho para el formulario */
+    background-color: transparent; /* Fondo semitransparente */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Reducir el tamaño de los campos del formulario */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: beige;
+}
+
+.select, .form-control, .form-control-file {
+    font-size: 0.9rem;  /* Reducir el tamaño de la fuente */
+    padding: 8px;       /* Reducir el padding */
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    width: 100%;        /* Asegura que el campo ocupe todo el ancho del formulario */
+}
+
+/* Estilo para el botón */
+button[type="submit"], #vistaClienteButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+button[type="submit"]:hover, #vistaClienteButton:hover {
+    background-color: #218838;
+}
+
+/* Estilo para el botón de vista_cliente */
+#vistaClienteButton {
+    background-color: #007bff;  /* Cambiar el color para diferenciarlo */
+}
+
+#vistaClienteButton:hover {
+    background-color: #0056b3;  /* Color al hacer hover */
+}
+/* Estilos para el modal */
+.modal-content {
+    background-color: white; /* Fondo blanco para el modal */
+    border-radius: 1rem; /* Bordes redondeados */
+    border: 1px solid #ccc; /* Borde gris claro */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* Encabezado del modal */
+.modal-header {
+    background-color: #f8f9fa; /* Fondo gris claro para el encabezado */
+    border-bottom: 1px solid #dee2e6; /* Borde sutil en la parte inferior */
+    padding: 1rem; /* Espaciado en el encabezado */
+}
+
+.modal-title {
+    color: #343a40; /* Título en color oscuro */
+    font-size: 1.25rem; /* Tamaño de fuente del título */
+    font-weight: 600; /* Negrita en el título */
+}
+
+/* Cuerpo del modal */
+.modal-body {
+    padding: 1.5rem; /* Espaciado dentro del cuerpo */
+    color: #495057; /* Color gris oscuro para el texto */
+    font-size: 1rem; /* Tamaño de fuente del cuerpo */
+}
+
+/* Botón de cerrar en el modal */
+.btn-close-white {
+    color: #343a40; /* Color oscuro para el botón de cerrar */
+    background: transparent; /* Fondo transparente */
+    border: none; /* Sin borde */
+}
+
+/* Fondo del modal cuando está activo (cuando se muestra) */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+}
+
+/* Estilos para el pie del modal */
+.modal-footer {
+    background-color: #f8f9fa; /* Fondo gris claro para el pie del modal */
+    border-top: 1px solid #dee2e6; /* Borde sutil en la parte superior */
+    padding: 1rem; /* Espaciado en el pie */
+}
+
+.modal-footer .btn {
+    border-radius: 0.5rem; /* Bordes redondeados en los botones */
+}

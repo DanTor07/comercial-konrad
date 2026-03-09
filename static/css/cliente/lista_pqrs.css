@@ -1,0 +1,534 @@
+/* ============================================= */
+/*              Variables CSS                    */
+/* ============================================= */
+:root {
+    /* Colores principales */
+    --primary-color: #4361ee;
+    --primary-hover: #3a56d4;
+    --secondary-color: #6c757d;
+    --secondary-hover: #5a6268;
+    --success-color: #28a745;
+    --success-hover: #218838;
+    --info-color: #17a2b8;
+    --info-hover: #138496;
+    --warning-color: #6a0dad;
+    --warning-hover: #5a0099;
+    --danger-color: #dc3545;
+    --danger-hover: #bb2d3b;
+
+    /* Colores de texto y fondo */
+    --text-color: #2b2d42;
+    --light-bg: #f8f9fa;
+    --white: #ffffff;
+    --gray-light: #e9ecef;
+
+    /* Efectos */
+    --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+    --border-radius: 8px;
+}
+
+/* ============================================= */
+/*              Estilos Base                     */
+/* ============================================= */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* ============================================= */
+/*              Layout Principal                 */
+/* ============================================= */
+.pqrs-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 100vw; /* Asegura que no exceda el ancho de la pantalla */
+    overflow-x: hidden; /* Previene scroll horizontal */
+    margin: 0 auto;
+    /*padding: 20px;*/
+    box-sizing: border-box;
+}
+
+/* Tarjetas más anchas */
+.wide-card {
+    width: 100%;
+    min-width: 800px; /* Ancho mínimo para contenido horizontal */
+}
+/** Elementos de información *!*/
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px; /* Ancho mínimo para cada campo */
+    flex-shrink: 0; /* Evita que se compriman */
+}
+
+.info-item i {
+    color: #6c757d;
+    min-width: 16px; /* Ancho fijo para iconos */
+    text-align: center;
+}
+
+/* Elemento de acción */
+.action-item {
+    margin-left: auto; /* Empuja el botón a la derecha */
+}
+
+/* Diseño horizontal */
+.horizontal-layout {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 30px; /* Espacio entre elementos */
+    padding: 15px 20px;
+}
+
+/* Contenido principal */
+.pqrs-content {
+    width: 100%;
+    max-width: 900px; /* Ancho máximo del contenido */
+    margin: 0 auto; /* Centrado horizontal */
+    flex: 1;
+    padding: 20px 0;
+}
+
+
+/* ============================================= */
+/*              Cabecera                         */
+/* ============================================= */
+.pqrs-header {
+    text-align: center;
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: 0.4rem 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 10px;
+}
+
+.pqrs-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* ============================================= */
+/*              Sección de Bienvenida            */
+/* ============================================= */
+.user-welcome {
+    margin-bottom: 2rem;
+}
+
+.user-welcome h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-welcome p {
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+/* ============================================= */
+/*              Listado de PQRS                  */
+/* ============================================= */
+.pqrs-list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra horizontalmente */
+    width: 100%;
+    max-width: 860px; /* Ancho máximo ajustable */
+    margin: 0 auto; /* Centrado automático */
+    padding: 20px;
+}
+
+/* Tarjeta de PQRS */
+/*.pqrs-card {*/
+/*    background-color: var(--white);*/
+/*    border-radius: var(--border-radius);*/
+/*    box-shadow: var(--shadow);*/
+/*    overflow: hidden;*/
+/*    transition: var(--transition);*/
+/*    max-width: 900px; !* Ancho aumentado *!*/
+/*    margin: 0 auto 20px auto; !* Centrado con margen inferior *!*/
+/*    width: 100%;*/
+/*}*/
+
+.pqrs-card {
+    width: 100%; /* Ocupa el ancho disponible */
+    max-width: 900px; /* Ancho máximo para mejor legibilidad */
+    margin: 10px 0; /* Espaciado vertical */
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pqrs-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Encabezado de tarjeta */
+.pqrs-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.pqrs-number {
+    font-weight: bold;
+    font-size: 18px;
+    color: #2e3a4d;
+}
+
+.pqrs-card-body {
+    padding: 1.5rem;
+}
+
+.pqrs-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center; /* Centra el contenido verticalmente */
+}
+
+.pqrs-type, .pqrs-date, .pqrs-assigned {
+    text-align: center;
+    width: 100%;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+.info-item i {
+    color: var(--primary-color);
+    width: 20px;
+    text-align: center;
+}
+
+.pqrs-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* ============================================= */
+/*              Badges de Estado                 */
+/* ============================================= */
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-nuevo {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.badge-en-proceso {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.badge-resuelto {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.badge-cerrado {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* ============================================= */
+/*              Sin PQRS                         */
+/* ============================================= */
+.no-pqrs {
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.no-pqrs i {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.no-pqrs p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+}
+
+/* ============================================= */
+/*             Formulario de filtrado            */
+/* ============================================= */
+
+
+/* Formulario de filtrado */
+.filter-form {
+    background-color: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 2rem;
+}
+
+/* Grid para los campos del formulario */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas de igual ancho */
+    gap: 20px; /* Espacio aumentado entre elementos */
+    margin-bottom: 20px;
+}
+
+/* Grupos de formulario */
+.form-group {
+    margin-bottom: 0;
+    min-width: 200px; /* Ancho mínimo para evitar compresión */
+}
+
+/* Etiquetas */
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+/* Campos de entrada */
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/** Fila de fechas **/
+.date-row {
+    grid-column: span 3; /* Ocupa las 3 columnas */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Botones de acción */
+.form-actions {
+    grid-column: span 3;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+
+/* ============================================= */
+/*              Botones                          */
+/* ============================================= */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-details {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 15px;
+    background-color: #17a2b8;
+    color: white;
+    border-radius: 11px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+.btn-details i.fas.fa-eye { /* Selector específico para el icono del ojo */
+    color: white !important; /* Color blanco forzado */
+}
+
+.btn-details:hover {
+    background-color: #3a5ec0;
+}
+
+.btn-create {
+    background-color: #4361ee;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center; /* Centrado horizontal */
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* Efecto hover */
+.btn-create:hover {
+    background-color: #3a56d4;
+    transform: translateY(-2px);
+}
+
+/* Icono dentro del botón */
+.btn-create i.fas.fa-plus-circle {
+    color: white; /* Asegura color blanco */
+    font-size: 1rem; /* Tamaño consistente */
+    vertical-align: middle; /* Alineación vertical */
+    margin: 0; /* Elimina márgenes no deseados */
+    line-height: 1; /* Ajuste de línea base */
+}
+
+.btn-create:hover i {
+    color: white; /* Mantiene blanco en hover */
+}
+
+.btn-back {
+    background-color: var(--secondary-color);
+    color: var(--white);
+}
+
+.btn-back:hover {
+    background-color: var(--secondary-hover);
+    transform: translateY(-2px);
+}
+
+.btn-filter, .btn-clear {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-filter {
+    background-color: #4e73df;
+    color: white;
+}
+
+.btn-filter:hover {
+    background-color: #3a5ec0;
+}
+
+.btn-clear {
+    background-color: #e74a3b;
+    color: white;
+}
+
+.btn-clear:hover {
+    background-color: #d52a1a;
+}
+
+
+.btn-logout { background-color: var(--danger-color); color: var(--white); }
+.btn-logout:hover { background-color: var(--danger-hover); transform: translateY(-2px); }
+
+
+.action-buttons {
+    justify-content: flex-start;
+}
+
+/* ============================================= */
+/*              Pie de Página                    */
+/* ============================================= */
+.pqrs-footer {
+    background-color: var(--text-color);
+    color: var(--white);
+    text-align: center;
+    /*padding: 0.4rem 2rem;*/
+    margin-top: auto;
+}
+
+/* ============================================= */
+/*              Media Queries                    */
+/* ============================================= */
+@media (max-width: 768px) {
+    .pqrs-content {
+        padding: 1.5rem;
+    }
+
+    .pqrs-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .pqrs-actions {
+        justify-content: flex-start;
+    }
+
+    .btn-details {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .pqrs-content {
+        padding: 1rem;
+    }
+
+    .pqrs-info {
+        grid-template-columns: 1fr;
+    }
+
+    .no-pqrs {
+        padding: 1.5rem;
+    }
+
+    .btn-create {
+        width: 100%;
+        justify-content: center;
+    }
+}
+

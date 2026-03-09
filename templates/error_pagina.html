@@ -1,0 +1,19 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | Página no encontrada</title>
+    <!-- Aquí puedes incluir tu CSS u otros archivos estáticos -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="error-container">
+        <h1>¡Algo salió mal!</h1>
+        <p>No se pudo encontrar la página que estás buscando.</p>
+        <a href="{% url 'inicio' %}">Volver al inicio</a>
+    </div>
+</body>
+</html>
