@@ -8,7 +8,8 @@ from .infrastructure.dependencies import (
     get_buscar_productos_use_case,
     get_gestionar_carrito_use_case,
     get_crear_producto_use_case,
-    get_procesar_checkout_use_case
+    get_checkout_facade,
+    get_producto_repo_auditado
 )
 from .domain.entities.vendedor import SolicitudVendedor, SolicitudEstado
 from .domain.entities.venta import Carrito, CarritoItem, MetodoPago
@@ -117,19 +118,29 @@ def checkout(request):
     if not cart_data['items']:
         messages.warning(request, "Tu carrito está vacío.")
         return redirect('catalog')
+
     if request.method == 'POST':
         metodo_pago_str = request.POST.get('metodo_pago')
         metodo_pago = MetodoPago(metodo_pago_str)
-        cart = Carrito(comprador_id=1, items=[CarritoItem(**item) for item in cart_data['items']])
+        comprador_id = request.user.id if request.user.is_authenticated else 1
+        cart = Carrito(
+            comprador_id=comprador_id,
+            items=[CarritoItem(**item) for item in cart_data['items']]
+        )
         try:
-            pedido = get_procesar_checkout_use_case().execute(cart, metodo_pago)
-            if pedido.estado == "PAGADO":
+            # Facade coordina: validación de stock, pago (Strategy),
+            # persistencia atómica en BD y actualización de stock (con Decorator de auditoría)
+            facade = get_checkout_facade(usuario_id=comprador_id)
+            resultado = facade.procesar(cart, metodo_pago, comprador_id)
+
+            if resultado['success']:
                 request.session['cart'] = {'items': []}
-                return render(request, 'checkout_success.html', {'pedido': pedido})
+                return render(request, 'checkout_success.html', {'resultado': resultado})
             else:
-                messages.error(request, "El pago no pudo ser procesado.")
+                messages.error(request, resultado['message'])
         except Exception as e:
             messages.error(request, f"Error en el checkout: {str(e)}")
+
     return render(request, 'checkout.html', {'cart': cart_data})
 
 def bam_dashboard(request):

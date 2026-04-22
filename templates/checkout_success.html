@@ -7,18 +7,36 @@
     <style>
         :root { --primary: #4F46E5; --success: #10B981; }
         body { font-family: 'Outfit', sans-serif; text-align: center; padding: 100px 5%; background: #F9FAFB; }
-        .card { max-width: 500px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .card { max-width: 520px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         .icon { font-size: 4rem; color: var(--success); margin-bottom: 20px; }
-        .btn-home { display: inline-block; padding: 12px 30px; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 20px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; }
+        .summary-row.total { font-weight: 700; font-size: 1.1rem; color: var(--primary); border-bottom: none; margin-top: 8px; }
+        .badge { display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 20px; }
+        .btn-home { display: inline-block; padding: 12px 30px; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 24px; }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="icon">✓</div>
         <h1>¡Pago Exitoso!</h1>
-        <p>Tu pedido ha sido procesado correctamente.</p>
-        <p><strong>Total pagado: ${{ pedido.total }}</strong></p>
-        <p>Método: {{ pedido.metodo_pago.value }}</p>
+        <span class="badge">Pedido #{{ resultado.pedido_id }}</span>
+        <p>Tu pedido ha sido registrado y procesado correctamente.</p>
+
+        <div style="text-align: left; margin: 20px 0;">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>${{ resultado.subtotal }}</span>
+            </div>
+            <div class="summary-row">
+                <span>IVA (19%)</span>
+                <span>${{ resultado.iva }}</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total pagado</span>
+                <span>${{ resultado.total }}</span>
+            </div>
+        </div>
+
         <a href="{% url 'catalog' %}" class="btn-home">Volver al Catálogo</a>
     </div>
 </body>
