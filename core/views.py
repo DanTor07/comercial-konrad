@@ -19,32 +19,37 @@ def home(request):
     return render(request, 'inicio.html')
 
 def registrar_vendedor(request):
+    from .application.facades.registration_facade import RegistrationFacade
+
     if request.method == 'POST':
         form = SolicitudVendedorForm(request.POST, request.FILES)
         if form.is_valid():
-            # Save the main application
-            solicitud = form.save()
-            
-            # Save attached documents
-            documentos = {
-                'fotocopia_cedula': 'Fotocopia de la cédula',
-                'rut': 'RUT',
-                'camara_comercio': 'Cámara de comercio',
-                'aceptacion_centrales': 'Aceptación centrales',
-                'aceptacion_datos': 'Aceptación datos'
-            }
-            
-            for field_name, tipo_label in documentos.items():
-                archivo = request.FILES.get(field_name)
-                if archivo:
-                    from .models import DocumentoAdjunto
-                    DocumentoAdjunto.objects.create(
-                        solicitud=solicitud,
-                        tipo=tipo_label,
-                        archivo=archivo
-                    )
-            
-            messages.success(request, f'Solicitud registrada exitosamente. Su número de solicitud es: {solicitud.id}')
+            # Facade coordina: guardado, Factory de documentos y Chain de validación
+            facade = RegistrationFacade()
+            resultado = facade.process_registration(form, request.FILES)
+
+            estado = resultado['estado']
+            sol_id = resultado['solicitud_id']
+
+            if estado == 'PENDIENTE':
+                messages.success(
+                    request,
+                    f'✅ Solicitud #{sol_id} registrada. '
+                    f'Estado: PENDIENTE — En espera de aprobación del director.'
+                )
+            elif estado == 'RECHAZADA':
+                messages.error(
+                    request,
+                    f'❌ Solicitud #{sol_id} rechazada automáticamente. '
+                    f'Motivo: {resultado["message"]}'
+                )
+            elif estado == 'DEVUELTA':
+                messages.warning(
+                    request,
+                    f'⚠️ Solicitud #{sol_id} devuelta para revisión. '
+                    f'Motivo: {resultado["message"]}'
+                )
+
             return redirect('inicio')
     else:
         form = SolicitudVendedorForm()
