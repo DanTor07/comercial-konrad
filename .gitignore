@@ -1,1 +1,8 @@
 .idea/
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+db.sqlite3
+*.log
+.env
