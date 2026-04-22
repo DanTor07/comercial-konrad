@@ -8,8 +8,11 @@ from .infrastructure.dependencies import (
     get_buscar_productos_use_case,
     get_gestionar_carrito_use_case,
     get_crear_producto_use_case,
+    get_crear_producto_use_case_con_proxy,
     get_checkout_facade,
-    get_producto_repo_auditado
+    get_producto_repo_auditado,
+    get_bam_service,
+    get_suscripcion_use_case,
 )
 from .domain.entities.vendedor import SolicitudVendedor, SolicitudEstado
 from .domain.entities.venta import Carrito, CarritoItem, MetodoPago
@@ -96,19 +99,44 @@ def create_product(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST)
         if form.is_valid():
+            # Resolver vendedor_id del usuario autenticado
+            vendedor_id = 1  # fallback
+            if request.user.is_authenticated:
+                try:
+                    vendedor_id = request.user.vendedor_profile.id
+                except Exception:
+                    pass
+
             producto_domain = Producto(
-                id=None, nombre=form.cleaned_data['nombre'], categoria_id=form.cleaned_data['categoria'].id,
-                subcategoria=form.cleaned_data['subcategoria'], marca=form.cleaned_data['marca'],
-                es_original=form.cleaned_data['es_original'], color=form.cleaned_data['color'],
-                tamano=form.cleaned_data['tamano'], peso=float(form.cleaned_data['peso']),
-                talla=form.cleaned_data['talla'], es_nuevo=form.cleaned_data['es_nuevo'],
-                vendedor_id=1, cantidad_disponible=form.cleaned_data['cantidad_disponible'],
-                valor_unitario=float(form.cleaned_data['valor_unitario']), caracteristicas=form.cleaned_data['caracteristicas'],
-                imagenes=[], calificacion=0.0
+                id=None,
+                nombre=form.cleaned_data['nombre'],
+                categoria_id=form.cleaned_data['categoria'].id,
+                subcategoria=form.cleaned_data['subcategoria'],
+                marca=form.cleaned_data['marca'],
+                es_original=form.cleaned_data['es_original'],
+                color=form.cleaned_data['color'],
+                tamano=form.cleaned_data['tamano'],
+                peso=float(form.cleaned_data['peso']),
+                talla=form.cleaned_data['talla'],
+                es_nuevo=form.cleaned_data['es_nuevo'],
+                vendedor_id=vendedor_id,
+                cantidad_disponible=form.cleaned_data['cantidad_disponible'],
+                valor_unitario=float(form.cleaned_data['valor_unitario']),
+                caracteristicas=form.cleaned_data['caracteristicas'],
+                imagenes=[],
             )
-            get_crear_producto_use_case().execute(producto_domain)
-            messages.success(request, 'Producto publicado.')
-            return redirect('catalog')
+            try:
+                # Proxy verifica que el vendedor este ACTIVO antes de guardar
+                # Decorator registra la operacion en auditoria de forma transparente
+                use_case = get_crear_producto_use_case_con_proxy(
+                    vendedor_id=vendedor_id,
+                    usuario_id=request.user.id if request.user.is_authenticated else None
+                )
+                use_case.execute(producto_domain)
+                messages.success(request, 'Producto publicado exitosamente.')
+                return redirect('catalog')
+            except PermissionError as e:
+                messages.error(request, str(e))
     else:
         form = ProductoForm()
     return render(request, 'crear_producto.html', {'form': form})
@@ -144,6 +172,31 @@ def checkout(request):
     return render(request, 'checkout.html', {'cart': cart_data})
 
 def bam_dashboard(request):
-    kpis = BAMService.get_kpis()
+    # Singleton: siempre la misma instancia de BAMService
+    bam = get_bam_service()
+    kpis = bam.get_kpis()
     auditorias = Auditoria.objects.all().order_by('-fecha')[:10]
     return render(request, 'bam_dashboard.html', {'kpis': kpis, 'auditorias': auditorias})
+
+
+def gestionar_suscripcion(request, vendedor_id):
+    """Vista del director para gestionar el estado de suscripcion de un vendedor."""
+    if request.method == 'POST':
+        accion = request.POST.get('accion')  # 'mora', 'reactivar', 'cancelar'
+        motivo = request.POST.get('motivo', '')
+        # Observer: el use case notifica a todos los observadores registrados
+        use_case = get_suscripcion_use_case()
+        if accion == 'mora':
+            resultado = use_case.marcar_mora(vendedor_id)
+        elif accion == 'reactivar':
+            resultado = use_case.reactivar(vendedor_id)
+        elif accion == 'cancelar':
+            resultado = use_case.cancelar(vendedor_id, motivo)
+        else:
+            resultado = {'success': False, 'message': 'Accion no reconocida.'}
+
+        if resultado['success']:
+            messages.success(request, resultado['message'])
+        else:
+            messages.error(request, resultado['message'])
+    return redirect('dashboard_director')
