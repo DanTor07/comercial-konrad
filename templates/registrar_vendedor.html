@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="es">
 
 <head>
@@ -243,8 +244,8 @@
                     Descárgalos ahora mismo para completar tu registro.
                 </div>
                 <div class="formats-links">
-                    <a href="#" class="format-btn">Riesgo Central</a>
-                    <a href="#" class="format-btn">Tratamiento Datos</a>
+                    <a href="{% static 'documents/formato_centrales.pdf' %}" class="format-btn" download>Riesgo Central</a>
+                    <a href="{% static 'documents/formato_datos.pdf' %}" class="format-btn" download>Tratamiento Datos</a>
                 </div>
             </div>
 
