@@ -33,6 +33,10 @@ def get_crear_producto_use_case():
     return CrearProductoUseCase(DjangoProductoRepository())
 
 
+def get_gestionar_carrito_use_case():
+    return GestionarCarritoUseCase(DjangoProductoRepository())
+
+
 def get_crear_producto_use_case_con_proxy(vendedor_id: int, usuario_id=None):
     """
     Patron: Proxy (proteccion) + Decorator (auditoria)

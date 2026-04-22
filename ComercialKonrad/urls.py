@@ -4,7 +4,8 @@ from core.views import (
     home, registrar_vendedor, dashboard_director,
     procesar_solicitud, catalog, add_to_cart,
     view_cart, create_product, checkout, bam_dashboard,
-    gestionar_suscripcion
+    gestionar_suscripcion,
+    crear_pqrs, listar_pqrs, detalle_pqrs, gestion_pqrs
 )
 from core.interfaces.api.api_views import get_simulated_sales, get_simulated_sellers
 from django.conf import settings
@@ -23,6 +24,11 @@ urlpatterns = [
     path('director/', dashboard_director, name='dashboard_director'),
     path('director/procesar/<int:solicitud_id>/', procesar_solicitud, name='procesar_solicitud'),
     path('director/suscripcion/<int:vendedor_id>/', gestionar_suscripcion, name='gestionar_suscripcion'),
+    # PQRS
+    path('pqrs/', listar_pqrs, name='listar_pqrs'),
+    path('pqrs/nueva/', crear_pqrs, name='crear_pqrs'),
+    path('pqrs/<int:pqrs_id>/', detalle_pqrs, name='detalle_pqrs'),
+    path('pqrs/gestion/', gestion_pqrs, name='gestion_pqrs'),
     # API REST (Externa)
     path('api/ventas/', get_simulated_sales, name='api_ventas'),
     path('api/vendedores/', get_simulated_sellers, name='api_vendedores'),

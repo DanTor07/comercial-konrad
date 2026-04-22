@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis PQRS | Supermarket</title>
+    <title>Mis PQRS | Comercial Konrad</title>
     <link rel="stylesheet" href="{% static 'css/cliente/lista_pqrs.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="pqrs-container">
         <header class="pqrs-header">
-            <h1><i class="fas fa-tasks"></i> Supermarket - Sistema PQRS</h1>
+            <h1><i class="fas fa-tasks"></i> Comercial Konrad - Sistema PQRS</h1>
         </header>
 
         <main class="pqrs-content">
@@ -20,92 +20,35 @@
                 <p>Aquí puedes ver y filtrar todas tus solicitudes</p>
             </div>
 
-            <!-- Formulario de filtrado -->
-            <form method="get" class="filter-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="id_numero_radicado">Número de Radicado:</label>
-                        <input type="number" name="numero_radicado" id="id_numero_radicado"
-                               placeholder="Ej: 1001" value="{{ form.numero_radicado.value|default_if_none:'' }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_tipo_radicado">Tipo de PQRS:</label>
-                        <select name="tipo_radicado" id="id_tipo_radicado">
-                            <option value="">Todos</option>
-                            {% for value, label in form.tipo_radicado.field.choices %}
-                                <option value="{{ value }}" {% if form.tipo_radicado.value == value %}selected{% endif %}>
-                                    {{ label }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_estado">Estado:</label>
-                            <select name="estado" id="id_estado">
-                                <option value="">Todos</option>
-                                {% for value, label in form.estado.field.choices %}
-                                    <option value="{{ value }}"
-                                            {% if form.estado.value == value %}selected{% endif %}>
-                                        {{ label }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_fecha_inicio">Desde:</label>
-                        <input type="date" name="fecha_inicio" id="id_fecha_inicio"
-                               value="{{ form.fecha_inicio.value|default_if_none:'' }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_fecha_fin">Hasta:</label>
-                        <input type="date" name="fecha_fin" id="id_fecha_fin"
-                               value="{{ form.fecha_fin.value|default_if_none:'' }}">
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-filter">
-                        <i class="fas fa-filter"></i> Filtrar
-                    </button>
-                    <a href="{% url 'listar_pqrs' %}" class="btn btn-clear">
-                        <i class="fas fa-broom"></i> Limpiar
-                    </a>
-                </div>
-            </form>
+            <div class="form-actions" style="margin-bottom:16px;">
+                <a href="{% url 'crear_pqrs' %}" class="btn btn-filter">
+                    <i class="fas fa-plus"></i> Nueva PQRS
+                </a>
+            </div>
 
             {% if pqrs_list %}
             <div class="pqrs-list-container">
                 {% for pqrs in pqrs_list %}
                 <div class="pqrs-card wide-card">
                     <div class="pqrs-card-header">
-                        <span class="pqrs-number">#{{ pqrs.numero_radicado }}</span>
-                        <span class="status-badge badge-{{ pqrs.estado|slugify }}">{{ pqrs.get_estado_display }}</span>
+                        <span class="pqrs-number">#{{ pqrs.id }}</span>
+                        <span class="status-badge badge-{{ pqrs.estado|lower }}">{{ pqrs.get_estado_display }}</span>
                     </div>
-
                     <div class="pqrs-card-body horizontal-layout">
                         <div class="info-item">
                             <i class="fas fa-tag"></i>
-                            <span>{{ pqrs.get_tipo_radicado_display }}</span>
+                            <span>{{ pqrs.get_tipo_display }}</span>
                         </div>
-
                         <div class="info-item">
                             <i class="fas fa-calendar-alt"></i>
-                            <span>{{ pqrs.fecha_radicado|date:"d/m/Y H:i" }}</span>
+                            <span>{{ pqrs.fecha_creacion|date:"d/m/Y H:i" }}</span>
                         </div>
-
-                        {% if pqrs.empleado_asignado %}
                         <div class="info-item">
-                            <i class="fas fa-user-tie"></i>
-                            <span>Gestor/a: {{ pqrs.empleado_asignado.nombre }} {{ pqrs.empleado_asignado.apellido }}</span>
+                            <i class="fas fa-route"></i>
+                            <span>Ruta: {{ pqrs.ruta_estados }}</span>
                         </div>
-                        {% endif %}
-
                         <div class="info-item action-item">
-                            <a href="{% url 'detalle_pqrs' pqrs.numero_radicado %}" class="btn-details">
+                            <a href="{% url 'detalle_pqrs' pqrs.id %}" class="btn-details">
                                 <i class="fas fa-eye"></i> Ver detalles
                             </a>
                         </div>
@@ -124,17 +67,17 @@
             {% endif %}
 
             <div class="action-buttons">
-                <a href="{% url 'vista_cliente' %}" class="btn btn-back">
-                    <i class="fas fa-arrow-left"></i> Volver al panel
+                <a href="{% url 'inicio' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Volver al inicio
                 </a>
-                <a href="{% url 'cerrar_sesion' %}" class="btn btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                <a href="{% url 'crear_pqrs' %}" class="btn btn-create">
+                    <i class="fas fa-plus-circle"></i> Nueva PQRS
                 </a>
             </div>
         </main>
 
         <footer class="pqrs-footer">
-            <p>&copy; 2025 Supermarket - Sistema PQRS. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Comercial Konrad. Todos los derechos reservados.</p>
         </footer>
     </div>
 </body>

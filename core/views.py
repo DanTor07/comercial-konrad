@@ -19,7 +19,9 @@ from .domain.entities.venta import Carrito, CarritoItem, MetodoPago
 from .domain.entities.producto import Producto
 from .infrastructure.services.monitoring import BAMService
 from .application.facades.registration_facade import RegistrationFacade
-from .models import SolicitudVendedor as SolicitudVendedorModel, Auditoria
+from .application.factories.pqrs_factory import PQRSFactory
+from .application.use_cases.pqrs_use_cases import RadicarPQRSUseCase, GestionarPQRSUseCase
+from .models import SolicitudVendedor as SolicitudVendedorModel, Auditoria, PQRS as PQRSModel
 
 def home(request):
     return render(request, 'inicio.html')
@@ -200,3 +202,79 @@ def gestionar_suscripcion(request, vendedor_id):
         else:
             messages.error(request, resultado['message'])
     return redirect('dashboard_director')
+
+
+# ── Vistas PQRS ───────────────────────────────────────────────────────────────
+
+def crear_pqrs(request):
+    """
+    Vista para que los usuarios radiquen una solicitud PQRS.
+    Usa PQRSFactory (Factory Method) para crear el tipo correcto
+    sin exponer la lógica de instanciación a la vista.
+    """
+    tipos = PQRSFactory.tipos_disponibles()
+
+    if request.method == 'POST':
+        tipo = request.POST.get('tipo', '').upper()
+        descripcion = request.POST.get('descripcion', '').strip()
+
+        if not request.user.is_authenticated:
+            messages.error(request, 'Debes iniciar sesion para radicar una PQRS.')
+            return redirect('inicio')
+
+        try:
+            resultado = RadicarPQRSUseCase().execute(tipo, request.user, descripcion)
+            messages.success(request, resultado['message'])
+            return redirect('listar_pqrs')
+        except (ValueError, Exception) as e:
+            messages.error(request, str(e))
+
+    return render(request, 'crear-pqrs.html', {'tipos': tipos})
+
+
+def listar_pqrs(request):
+    """Lista las PQRS del usuario autenticado con su ruta de estados."""
+    if not request.user.is_authenticated:
+        messages.error(request, 'Debes iniciar sesion.')
+        return redirect('inicio')
+
+    use_case = GestionarPQRSUseCase()
+    pqrs_list = use_case.listar(usuario=request.user, solo_activas=False)
+    return render(request, 'listar_pqrs.html', {'pqrs_list': pqrs_list})
+
+
+def detalle_pqrs(request, pqrs_id):
+    """Detalle de una PQRS con la traza del Routing Slip."""
+    use_case = GestionarPQRSUseCase()
+    pqrs = use_case.obtener(pqrs_id)
+    if not pqrs:
+        messages.error(request, f'PQRS #{pqrs_id} no encontrada.')
+        return redirect('listar_pqrs')
+    # La ruta_estados contiene el Routing Slip: "RADICADA -> EN_GESTION -> RESPONDIDA"
+    ruta = pqrs.ruta_estados.split(' -> ')
+    return render(request, 'detalle_pqrs.html', {'pqrs': pqrs, 'ruta': ruta})
+
+
+def gestion_pqrs(request):
+    """Dashboard del gestor: lista y gestiona todas las PQRS."""
+    use_case = GestionarPQRSUseCase()
+
+    if request.method == 'POST':
+        pqrs_id = request.POST.get('pqrs_id')
+        nuevo_estado = request.POST.get('nuevo_estado', '').upper()
+        respuesta_texto = request.POST.get('respuesta', '').strip()
+        resultado = use_case.avanzar_estado(
+            int(pqrs_id), nuevo_estado, request.user, respuesta_texto
+        )
+        if resultado['success']:
+            messages.success(request, resultado['message'])
+        else:
+            messages.error(request, resultado['message'])
+        return redirect('gestion_pqrs')
+
+    todas = use_case.listar(usuario=None, solo_activas=False)
+    return render(request, 'gestion_pqrs.html', {
+        'pqrs_list': todas,
+        'usuario': request.user,
+        'estados_siguientes': ['EN_GESTION', 'RESPONDIDA', 'CERRADA'],
+    })
