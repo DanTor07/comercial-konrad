@@ -16,8 +16,13 @@ class SolicitudVendedor(models.Model):
         ('DEVUELTA', 'Devuelta'),
         ('APROBADA', 'Aprobada'),
     ]
+    TIPO_PERSONA_CHOICES = [
+        ('NATURAL', 'Persona Natural'),
+        ('JURIDICA', 'Persona Jurídica'),
+    ]
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
+    tipo_persona = models.CharField(max_length=10, choices=TIPO_PERSONA_CHOICES, default='NATURAL')
     numero_identificacion = models.CharField(max_length=20, unique=True)
     correo_electronico = models.EmailField()
     pais = models.CharField(max_length=100)

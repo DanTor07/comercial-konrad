@@ -2,18 +2,35 @@ from django import forms
 from .models import SolicitudVendedor, Producto, Categoria
 
 class SolicitudVendedorForm(forms.ModelForm):
+    fotocopia_cedula = forms.FileField(label="Fotocopia de la cédula", widget=forms.FileInput(attrs={'class': 'form-control'}))
+    rut = forms.FileField(label="RUT", widget=forms.FileInput(attrs={'class': 'form-control'}))
+    camara_comercio = forms.FileField(label="Cámara de comercio", required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'id': 'id_camara_comercio_row'}))
+    aceptacion_centrales = forms.FileField(label="Aceptación consulta centrales", widget=forms.FileInput(attrs={'class': 'form-control'}))
+    aceptacion_datos = forms.FileField(label="Aceptación tratamiento datos", widget=forms.FileInput(attrs={'class': 'form-control'}))
+
     class Meta:
         model = SolicitudVendedor
-        fields = ['nombres', 'apellidos', 'numero_identificacion', 'correo_electronico', 'pais', 'ciudad', 'telefono']
+        fields = ['nombres', 'apellidos', 'tipo_persona', 'numero_identificacion', 'correo_electronico', 'pais', 'ciudad', 'telefono']
         widgets = {
-            'nombres': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombres'}),
-            'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
-            'numero_identificacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cédula o Nit'}),
-            'correo_electronico': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
-            'pais': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'País'}),
-            'ciudad': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ciudad'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'}),
+            'nombres': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellidos': forms.TextInput(attrs={'class': 'form-control'}),
+            'tipo_persona': forms.Select(attrs={'class': 'form-select', 'id': 'id_tipo_persona'}),
+            'numero_identificacion': forms.TextInput(attrs={'class': 'form-control'}),
+            'correo_electronico': forms.EmailInput(attrs={'class': 'form-control'}),
+            'pais': forms.TextInput(attrs={'class': 'form-control'}),
+            'ciudad': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo_persona = cleaned_data.get("tipo_persona")
+        camara_comercio = cleaned_data.get("camara_comercio")
+
+        if tipo_persona == 'JURIDICA' and not camara_comercio:
+            self.add_error('camara_comercio', "La Cámara de Comercio es obligatoria para personas jurídicas.")
+        
+        return cleaned_data
 
 class ProductoForm(forms.ModelForm):
     class Meta:

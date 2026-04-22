@@ -20,6 +20,7 @@ class DjangoSolicitudVendedorRepository(SolicitudVendedorRepositoryPort):
                 pais=solicitud.pais,
                 ciudad=solicitud.ciudad,
                 telefono=solicitud.telefono,
+                tipo_persona=solicitud.tipo_persona.value,
                 estado=solicitud.estado.value
             )
             solicitud.id = model.id
@@ -46,6 +47,7 @@ class DjangoSolicitudVendedorRepository(SolicitudVendedorRepositoryPort):
             pais=model.pais,
             ciudad=model.ciudad,
             telefono=model.telefono,
+            tipo_persona=PersonaTipo(model.tipo_persona),
             estado=SolicitudEstado(model.estado),
             documentos=[], # Mapping files would go here
             comentarios_director=model.comentarios_director

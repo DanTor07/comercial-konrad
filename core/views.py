@@ -20,15 +20,31 @@ def home(request):
 
 def registrar_vendedor(request):
     if request.method == 'POST':
-        form = SolicitudVendedorForm(request.POST)
+        form = SolicitudVendedorForm(request.POST, request.FILES)
         if form.is_valid():
-            solicitud = SolicitudVendedor(
-                id=None, nombres=form.cleaned_data['nombres'], apellidos=form.cleaned_data['apellidos'],
-                numero_identificacion=form.cleaned_data['numero_identificacion'], correo_electronico=form.cleaned_data['correo_electronico'],
-                pais=form.cleaned_data['pais'], ciudad=form.cleaned_data['ciudad'], telefono=form.cleaned_data['telefono'], documentos=[]
-            )
-            get_registrar_solicitud_use_case().execute(solicitud)
-            messages.success(request, 'Solicitud registrada.')
+            # Save the main application
+            solicitud = form.save()
+            
+            # Save attached documents
+            documentos = {
+                'fotocopia_cedula': 'Fotocopia de la cédula',
+                'rut': 'RUT',
+                'camara_comercio': 'Cámara de comercio',
+                'aceptacion_centrales': 'Aceptación centrales',
+                'aceptacion_datos': 'Aceptación datos'
+            }
+            
+            for field_name, tipo_label in documentos.items():
+                archivo = request.FILES.get(field_name)
+                if archivo:
+                    from .models import DocumentoAdjunto
+                    DocumentoAdjunto.objects.create(
+                        solicitud=solicitud,
+                        tipo=tipo_label,
+                        archivo=archivo
+                    )
+            
+            messages.success(request, f'Solicitud registrada exitosamente. Su número de solicitud es: {solicitud.id}')
             return redirect('inicio')
     else:
         form = SolicitudVendedorForm()

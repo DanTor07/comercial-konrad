@@ -1,37 +1,375 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Vendedor - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Registro de Vendedor | Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .form-container { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        h1 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        input { width: 100%; padding: 10px; border: 1px solid #E5E7EB; border-radius: 8px; box-sizing: border-box; }
-        .btn-submit { width: 100%; padding: 12px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
-        .btn-submit:hover { opacity: 0.9; }
-        .back-link { display: block; text-align: center; margin-top: 1.5rem; color: #6B7280; text-decoration: none; }
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --bg: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .registration-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 50px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary), #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            color: #475569;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            background: #f8fafc;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin-right: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .formats-box {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .formats-text {
+            font-size: 0.9rem;
+            color: #3730a3;
+        }
+
+        .formats-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .format-btn {
+            padding: 8px 16px;
+            background: #fff;
+            color: var(--primary);
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: 1px solid #c7d2fe;
+            transition: all 0.2s;
+        }
+
+        .format-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, var(--primary), #4338ca);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: var(--primary);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .registration-card {
+                padding: 30px 20px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <div class="form-container">
-        <h1>Únete como Vendedor</h1>
-        <form method="POST">
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="form-group">
-                    <label>{{ field.label }}</label>
-                    {{ field }}
+    <div class="container">
+        <div class="registration-card">
+            <h1>Únete como Vendedor</h1>
+            <p class="subtitle">Comienza a escalar tu negocio con Comercial Konrad</p>
+
+            <div class="formats-box">
+                <div class="formats-text">
+                    <strong>¿Aún no tienes los formatos?</strong><br>
+                    Descárgalos ahora mismo para completar tu registro.
                 </div>
-            {% endfor %}
-            <button type="submit" class="btn-submit">Enviar Solicitud</button>
-        </form>
-        <a href="{% url 'inicio' %}" class="back-link">← Volver al inicio</a>
+                <div class="formats-links">
+                    <a href="#" class="format-btn">Riesgo Central</a>
+                    <a href="#" class="format-btn">Tratamiento Datos</a>
+                </div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Sección 1: Datos Personales -->
+                <div class="form-section">
+                    <div class="section-title"><span>1</span> Información Personal</div>
+                    <div class="grid">
+                        <div class="form-group">
+                            <label>Nombres</label>
+                            {{ form.nombres }}
+                            {% if form.nombres.errors %}
+                            <div class="error-msg">{{ form.nombres.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label>Apellidos</label>
+                            {{ form.apellidos }}
+                            {% if form.apellidos.errors %}
+                            <div class="error-msg">{{ form.apellidos.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            {{ form.correo_electronico }}
+                            {% if form.correo_electronico.errors %}
+                            <div class="error-msg">{{ form.correo_electronico.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                            <div class="error-msg">{{ form.telefono.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 2: Ubicación y Tipo -->
+                <div class="form-section">
+                    <div class="section-title"><span>2</span> Perfil de Negocio</div>
+                    <div class="grid">
+                        <div class="form-group">
+                            <label>Tipo de Persona</label>
+                            {{ form.tipo_persona }}
+                        </div>
+                        <div class="form-group">
+                            <label>Identificación (Cédula o NIT)</label>
+                            {{ form.numero_identificacion }}
+                            {% if form.numero_identificacion.errors %}
+                            <div class="error-msg">{{ form.numero_identificacion.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label>País</label>
+                            {{ form.pais }}
+                        </div>
+                        <div class="form-group">
+                            <label>Ciudad</label>
+                            {{ form.ciudad }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 3: Documentación -->
+                <div class="form-section">
+                    <div class="section-title"><span>3</span> Documentos Adjuntos</div>
+                    <div class="grid">
+                        <div class="form-group">
+                            <label>Fotocopia Cédula (PDF/JPG)</label>
+                            {{ form.fotocopia_cedula }}
+                        </div>
+                        <div class="form-group">
+                            <label>RUT Actualizado</label>
+                            {{ form.rut }}
+                        </div>
+                        <div class="form-group" id="row_camara_comercio">
+                            <label>Cámara de Comercio</label>
+                            {{ form.camara_comercio }}
+                            {% if form.camara_comercio.errors %}
+                            <div class="error-msg">{{ form.camara_comercio.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label>Formato Centrales</label>
+                            {{ form.aceptacion_centrales }}
+                        </div>
+                        <div class="form-group">
+                            <label>Tratamiento de Datos</label>
+                            {{ form.aceptacion_datos }}
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Registrarme Ahora</button>
+            </form>
+
+            <a href="{% url 'inicio' %}" class="back-link">← Volver al inicio</a>
+        </div>
     </div>
+
+    <script>
+        const tipoPersonaSelect = document.getElementById('id_tipo_persona');
+        const camaraComercioRow = document.getElementById('row_camara_comercio');
+
+        function toggleJuridicaFields() {
+            if (tipoPersonaSelect && tipoPersonaSelect.value === 'JURIDICA') {
+                camaraComercioRow.style.opacity = '1';
+                camaraComercioRow.style.pointerEvents = 'auto';
+                camaraComercioRow.style.filter = 'none';
+            } else if (camaraComercioRow) {
+                camaraComercioRow.style.opacity = '0.3';
+                camaraComercioRow.style.pointerEvents = 'none';
+                camaraComercioRow.style.filter = 'grayscale(1)';
+            }
+        }
+
+        if (tipoPersonaSelect) {
+            tipoPersonaSelect.addEventListener('change', toggleJuridicaFields);
+        }
+        window.addEventListener('DOMContentLoaded', toggleJuridicaFields);
+    </script>
 </body>
+
 </html>

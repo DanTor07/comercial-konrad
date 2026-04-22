@@ -14,6 +14,10 @@ class VendedorEstado(Enum):
     EN_MORA = "EN MORA"
     CANCELADA = "CANCELADA"
 
+class PersonaTipo(Enum):
+    NATURAL = "NATURAL"
+    JURIDICA = "JURIDICA"
+
 @dataclass
 class DocumentoAdjunto:
     tipo: str # e.g., "RUT", "Cédula", "Cámara de Comercio"
@@ -24,6 +28,7 @@ class SolicitudVendedor:
     id: Optional[int]
     nombres: str
     apellidos: str
+    tipo_persona: PersonaTipo
     numero_identificacion: str
     correo_electronico: str
     pais: str
