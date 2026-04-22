@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from ...models import DocumentoAdjunto as DocumentoAdjuntoModel
+
 
 class DocumentoAdjunto(ABC):
     """
@@ -110,8 +112,6 @@ class DocumentoFactory:
         Persiste en BD todos los documentos encontrados en files_dict.
         Usa la factory para construir cada objeto antes de guardarlo.
         """
-        from ...models import DocumentoAdjunto as DocumentoAdjuntoModel
-
         documentos = cls.create_all_from_files(files_dict)
         for doc in documentos:
             DocumentoAdjuntoModel.objects.create(

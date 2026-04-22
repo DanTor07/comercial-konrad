@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Tuple
+from typing import Optional
+
+from ...domain.ports.external_services import CreditScore
 
 
 class ValidationResult:
@@ -53,8 +55,6 @@ class CreditScoreHandler(ValidationHandler):
         self.cifin = cifin_adapter
 
     def handle(self, identificacion: str) -> ValidationResult:
-        from ...domain.ports.external_services import CreditScore
-
         score_dc = self.datacredito.check_score(identificacion)
         score_cifin = self.cifin.check_score(identificacion)
 

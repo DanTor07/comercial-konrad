@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import SolicitudVendedorForm, ProductoForm
 from .infrastructure.dependencies import (
-    get_registrar_solicitud_use_case, 
+    get_registrar_solicitud_use_case,
     get_procesar_decision_use_case,
     get_listar_categorias_use_case,
     get_buscar_productos_use_case,
@@ -14,13 +14,13 @@ from .domain.entities.vendedor import SolicitudVendedor, SolicitudEstado
 from .domain.entities.venta import Carrito, CarritoItem, MetodoPago
 from .domain.entities.producto import Producto
 from .infrastructure.services.monitoring import BAMService
+from .application.facades.registration_facade import RegistrationFacade
+from .models import SolicitudVendedor as SolicitudVendedorModel, Auditoria
 
 def home(request):
     return render(request, 'inicio.html')
 
 def registrar_vendedor(request):
-    from .application.facades.registration_facade import RegistrationFacade
-
     if request.method == 'POST':
         form = SolicitudVendedorForm(request.POST, request.FILES)
         if form.is_valid():
@@ -56,8 +56,7 @@ def registrar_vendedor(request):
     return render(request, 'registrar_vendedor.html', {'form': form})
 
 def dashboard_director(request):
-    from .models import SolicitudVendedor as SolicitudModel
-    solicitudes = SolicitudModel.objects.filter(estado='PENDIENTE')
+    solicitudes = SolicitudVendedorModel.objects.filter(estado='PENDIENTE')
     return render(request, 'director/dashboard.html', {'solicitudes': solicitudes})
 
 def procesar_solicitud(request, solicitud_id):
@@ -135,6 +134,5 @@ def checkout(request):
 
 def bam_dashboard(request):
     kpis = BAMService.get_kpis()
-    from .models import Auditoria
     auditorias = Auditoria.objects.all().order_by('-fecha')[:10]
     return render(request, 'bam_dashboard.html', {'kpis': kpis, 'auditorias': auditorias})
