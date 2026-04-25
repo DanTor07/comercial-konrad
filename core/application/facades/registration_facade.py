@@ -59,9 +59,7 @@ class RegistrationFacade:
         DocumentoFactory.persist_documents(solicitud, files_dict)
 
         # Paso 3: Ejecutar cadena de validación automática
-        resultado: ValidationResult = self._validation_chain.handle(
-            solicitud.numero_identificacion
-        )
+        resultado: ValidationResult = self._validation_chain.handle(solicitud)
 
         # Paso 4: Actualizar estado según resultado de la cadena
         if not resultado.passed:

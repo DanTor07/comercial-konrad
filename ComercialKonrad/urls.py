@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from core.views import (
     home, registrar_vendedor, dashboard_director,
-    procesar_solicitud, catalog, add_to_cart,
+    procesar_solicitud, detalle_solicitud, catalog, add_to_cart,
     view_cart, create_product, checkout, bam_dashboard,
     gestionar_suscripcion,
     crear_pqrs, listar_pqrs, detalle_pqrs, gestion_pqrs
@@ -22,7 +22,8 @@ urlpatterns = [
     path('bam/', bam_dashboard, name='bam_dashboard'),
     path('registrar-vendedor/', registrar_vendedor, name='registrar_vendedor'),
     path('director/', dashboard_director, name='dashboard_director'),
-    path('director/procesar/<int:solicitud_id>/', procesar_solicitud, name='procesar_solicitud'),
+    path('director/solicitud/<int:solicitud_id>/', procesar_solicitud, name='procesar_solicitud'),
+    path('director/detalle/<int:solicitud_id>/', detalle_solicitud, name='detalle_solicitud'),
     path('director/suscripcion/<int:vendedor_id>/', gestionar_suscripcion, name='gestionar_suscripcion'),
     # PQRS
     path('pqrs/', listar_pqrs, name='listar_pqrs'),

@@ -31,13 +31,16 @@ class SolicitudVendedor(models.Model):
     estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='PENDIENTE')
     comentarios_director = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    score_datacredito = models.CharField(max_length=20, blank=True, null=True)
+    score_cifin = models.CharField(max_length=20, blank=True, null=True)
+    tiene_antecedentes = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.nombres} {self.apellidos} - {self.numero_identificacion}"
 
 class DocumentoAdjunto(models.Model) :
     solicitud = models.ForeignKey(SolicitudVendedor, related_name='documentos', on_delete=models.CASCADE)
-    tipo = models.CharField(max_length=50) # Cédula, RUT, etc.
+    tipo = models.CharField(max_length=50)
     archivo = models.FileField(upload_to='vendedores/documentos/')
 
 class Vendedor(models.Model):

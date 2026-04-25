@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 from django.contrib import messages
 from .forms import SolicitudVendedorForm, ProductoForm
 from .infrastructure.dependencies import (
@@ -62,8 +63,40 @@ def registrar_vendedor(request):
     return render(request, 'registrar_vendedor.html', {'form': form})
 
 def dashboard_director(request):
-    solicitudes = SolicitudVendedorModel.objects.filter(estado='PENDIENTE')
-    return render(request, 'director/dashboard.html', {'solicitudes': solicitudes})
+    query = request.GET.get('q')
+    estado = request.GET.get('estado')
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+
+    solicitudes = SolicitudVendedorModel.objects.all()
+
+    if query:
+        solicitudes = solicitudes.filter(
+            Q(numero_identificacion__icontains=query) | 
+            Q(nombres__icontains=query) | 
+            Q(apellidos__icontains=query)
+        )
+    
+    if estado:
+        solicitudes = solicitudes.filter(estado=estado)
+    
+    if fecha_inicio:
+        solicitudes = solicitudes.filter(fecha_creacion__date__gte=fecha_inicio)
+    
+    if fecha_fin:
+        solicitudes = solicitudes.filter(fecha_creacion__date__lte=fecha_fin)
+
+    # Ordenar por fecha descendente por defecto
+    solicitudes = solicitudes.order_by('-fecha_creacion')
+
+    return render(request, 'director/dashboard.html', {
+        'solicitudes': solicitudes,
+        'estados': SolicitudVendedorModel.ESTADO_CHOICES
+    })
+
+def detalle_solicitud(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudVendedorModel, id=solicitud_id)
+    return render(request, 'director/detalle_solicitud.html', {'solicitud': solicitud})
 
 def procesar_solicitud(request, solicitud_id):
     if request.method == 'POST':

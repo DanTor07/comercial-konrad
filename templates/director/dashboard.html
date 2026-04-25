@@ -15,6 +15,8 @@
         th { background-color: #F9FAFB; font-weight: 600; color: #374151; }
         .badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 500; }
         .badge-pending { background-color: #FEF3C7; color: #92400E; }
+        .badge-approved { background-color: #D1FAE5; color: #065F46; }
+        .badge-rejected { background-color: #FEE2E2; color: #991B1B; }
         .action-form { display: flex; gap: 0.5rem; }
         select, input { padding: 6px; border-radius: 4px; border: 1px solid #D1D5DB; }
         button { padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; }
@@ -25,42 +27,82 @@
         <h1>Dashboard del Director</h1>
     </div>
     <div class="main">
-        <h2>Solicitudes Pendientes</h2>
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h3>Filtrar Solicitudes</h3>
+            <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+                <div>
+                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Búsqueda (Nombre/ID)</label>
+                    <input type="text" name="q" value="{{ request.GET.q|default:'' }}" style="width: 100%;">
+                </div>
+                <div>
+                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Estado</label>
+                    <select name="estado" style="width: 100%;">
+                        <option value="">Todos</option>
+                        {% for val, label in estados %}
+                        <option value="{{ val }}" {% if request.GET.estado == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Desde</label>
+                    <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio|default:'' }}" style="width: 100%;">
+                </div>
+                <div>
+                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Hasta</label>
+                    <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin|default:'' }}" style="width: 100%;">
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button type="submit">Aplicar Filtros</button>
+                    <a href="{% url 'dashboard_director' %}" style="padding: 6px 12px; background: #9CA3AF; color: white; text-decoration: none; border-radius: 4px;">Limpiar</a>
+                </div>
+            </form>
+        </div>
+
+        <h2>Listado de Solicitudes</h2>
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Fecha</th>
                     <th>Nombres</th>
                     <th>Identificación</th>
-                    <th>Correo</th>
                     <th>Estado</th>
-                    <th>Acción</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for s in solicitudes %}
                 <tr>
-                    <td>{{ s.id }}</td>
+                    <td>{{ s.fecha_creacion|date:"d/m/Y H:i" }}</td>
                     <td>{{ s.nombres }} {{ s.apellidos }}</td>
                     <td>{{ s.numero_identificacion }}</td>
-                    <td>{{ s.correo_electronico }}</td>
-                    <td><span class="badge badge-pending">{{ s.estado }}</span></td>
                     <td>
-                        <form action="{% url 'procesar_solicitud' s.id %}" method="POST" class="action-form">
-                            {% csrf_token %}
-                            <select name="decision">
-                                <option value="APROBADA">Aprobar</option>
-                                <option value="RECHAZADA">Rechazar</option>
-                                <option value="DEVUELTA">Devolver</option>
-                            </select>
-                            <input type="text" name="comentarios" placeholder="Notas...">
-                            <button type="submit">Procesar</button>
-                        </form>
+                        <span class="badge 
+                            {% if s.estado == 'PENDIENTE' %}badge-pending
+                            {% elif s.estado == 'APROBADA' %}badge-approved
+                            {% elif s.estado == 'RECHAZADA' %}badge-rejected
+                            {% endif %}">
+                            {{ s.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'detalle_solicitud' s.id %}" style="padding: 4px 8px; background: #10B981; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">Ver Detalle</a>
+                            {% if s.estado == 'PENDIENTE' %}
+                            <form action="{% url 'procesar_solicitud' s.id %}" method="POST" class="action-form">
+                                {% csrf_token %}
+                                <select name="decision" style="font-size: 0.8rem;">
+                                    <option value="APROBADA">Aprobar</option>
+                                    <option value="RECHAZADA">Rechazar</option>
+                                </select>
+                                <button type="submit" style="font-size: 0.8rem;">OK</button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center;">No hay solicitudes pendientes.</td>
+                    <td colspan="5" style="text-align: center;">No se encontraron solicitudes.</td>
                 </tr>
                 {% endfor %}
             </tbody>
