@@ -1,12 +1,36 @@
 from django import forms
+from django.core.validators import FileExtensionValidator
 from .models import SolicitudVendedor, Producto, Categoria
 
 class SolicitudVendedorForm(forms.ModelForm):
-    fotocopia_cedula = forms.FileField(label="Fotocopia de la cédula", widget=forms.FileInput(attrs={'class': 'form-control'}))
-    rut = forms.FileField(label="RUT", widget=forms.FileInput(attrs={'class': 'form-control'}))
-    camara_comercio = forms.FileField(label="Cámara de comercio", required=False, widget=forms.FileInput(attrs={'class': 'form-control', 'id': 'id_camara_comercio_row'}))
-    aceptacion_centrales = forms.FileField(label="Aceptación consulta centrales", widget=forms.FileInput(attrs={'class': 'form-control'}))
-    aceptacion_datos = forms.FileField(label="Aceptación tratamiento datos", widget=forms.FileInput(attrs={'class': 'form-control'}))
+    pdf_validator = FileExtensionValidator(allowed_extensions=['pdf'])
+
+    fotocopia_cedula = forms.FileField(
+        label="Fotocopia de la cédula", 
+        validators=[pdf_validator],
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf'})
+    )
+    rut = forms.FileField(
+        label="RUT", 
+        validators=[pdf_validator],
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf'})
+    )
+    camara_comercio = forms.FileField(
+        label="Cámara de comercio", 
+        required=False, 
+        validators=[pdf_validator],
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf', 'id': 'id_camara_comercio'})
+    )
+    aceptacion_centrales = forms.FileField(
+        label="Aceptación consulta centrales", 
+        validators=[pdf_validator],
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf'})
+    )
+    aceptacion_datos = forms.FileField(
+        label="Aceptación tratamiento datos", 
+        validators=[pdf_validator],
+        widget=forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf'})
+    )
 
     class Meta:
         model = SolicitudVendedor

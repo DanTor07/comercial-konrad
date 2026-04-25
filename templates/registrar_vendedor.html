@@ -318,16 +318,18 @@
                     <div class="section-title"><span>3</span> Documentos Adjuntos</div>
                     <div class="grid">
                         <div class="form-group">
-                            <label>Fotocopia Cédula (PDF/JPG)</label>
+                            <label>Fotocopia Cédula (PDF)</label>
                             {{ form.fotocopia_cedula }}
                         </div>
                         <div class="form-group">
                             <label>RUT Actualizado</label>
                             {{ form.rut }}
+                            <small style="color: var(--text-muted); font-size: 0.75rem;">Formato PDF obligatorio</small>
                         </div>
                         <div class="form-group" id="row_camara_comercio">
                             <label>Cámara de Comercio</label>
                             {{ form.camara_comercio }}
+                            <small id="camara_help" style="color: var(--text-muted); font-size: 0.75rem;">Requerido para Personas Jurídicas (PDF)</small>
                             {% if form.camara_comercio.errors %}
                             <div class="error-msg">{{ form.camara_comercio.errors.0 }}</div>
                             {% endif %}
@@ -352,17 +354,30 @@
 
     <script>
         const tipoPersonaSelect = document.getElementById('id_tipo_persona');
+        const camaraComercioInput = document.getElementById('id_camara_comercio');
         const camaraComercioRow = document.getElementById('row_camara_comercio');
+        const camaraHelp = document.getElementById('camara_help');
 
         function toggleJuridicaFields() {
             if (tipoPersonaSelect && tipoPersonaSelect.value === 'JURIDICA') {
-                camaraComercioRow.style.opacity = '1';
-                camaraComercioRow.style.pointerEvents = 'auto';
-                camaraComercioRow.style.filter = 'none';
-            } else if (camaraComercioRow) {
-                camaraComercioRow.style.opacity = '0.3';
-                camaraComercioRow.style.pointerEvents = 'none';
-                camaraComercioRow.style.filter = 'grayscale(1)';
+                if (camaraComercioRow) {
+                    camaraComercioRow.style.opacity = '1';
+                    camaraComercioRow.style.pointerEvents = 'auto';
+                    camaraComercioRow.style.filter = 'none';
+                }
+                if (camaraComercioInput) camaraComercioInput.required = true;
+                if (camaraHelp) camaraHelp.style.color = 'var(--primary)';
+            } else {
+                if (camaraComercioRow) {
+                    camaraComercioRow.style.opacity = '0.4';
+                    camaraComercioRow.style.pointerEvents = 'none';
+                    camaraComercioRow.style.filter = 'grayscale(0.8)';
+                }
+                if (camaraComercioInput) {
+                    camaraComercioInput.required = false;
+                    camaraComercioInput.value = ''; // Clear selection if switching back
+                }
+                if (camaraHelp) camaraHelp.style.color = 'var(--text-muted)';
             }
         }
 
