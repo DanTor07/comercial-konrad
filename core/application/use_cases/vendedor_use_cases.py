@@ -1,6 +1,9 @@
 from ...domain.entities.vendedor import SolicitudVendedor, SolicitudEstado
 from ...domain.ports.vendedor_repository import SolicitudVendedorRepositoryPort
 from ...domain.ports.external_services import CreditCheckPort, PoliceCheckPort, CreditScore
+from django.contrib.auth.models import User
+from ...models import Vendedor as VendedorModel, SolicitudVendedor as SolicitudModel
+from ...domain.services.notifications import SolicitudDecisionSubject, DecisionEmailObserver
 
 class RegistrarSolicitudVendedorUseCase:
     def __init__(self, repository: SolicitudVendedorRepositoryPort):
@@ -28,27 +31,48 @@ class ProcesarDecisionSolicitudUseCase:
         if not solicitud:
             raise ValueError("Solicitud no encontrada")
 
-        # Perform automated checks
-        score_dc = self.datacredito.check_score(solicitud.numero_identificacion)
-        score_cifin = self.cifin.check_score(solicitud.numero_identificacion)
-        has_record = self.policia.has_criminal_record(solicitud.numero_identificacion)
+        # Asignar la decisión manual del director
+        solicitud.estado = decision_manual
+        solicitud.comentarios_director = comentarios
+        self.repository.save(solicitud)
 
-        # Business Rules for automatic transitions
-        # RECHAZADA: Si su vida crediticia es Baja en alguna de las entidades o es requerida por la justicia
-        if score_dc == CreditScore.BAJA or score_cifin == CreditScore.BAJA or has_record:
-            solicitud.estado = SolicitudEstado.RECHAZADA
-            solicitud.comentarios_director = "Automáticamente rechazada por bajo score crediticio o antecedentes."
-        # DEVUELTA: Si su vida crediticia está en Advertencia
-        elif score_dc == CreditScore.ADVERTENCIA or score_cifin == CreditScore.ADVERTENCIA:
-            solicitud.estado = SolicitudEstado.DEVUELTA
-            solicitud.comentarios_director = "Automáticamente devuelta por estado de advertencia crediticia."
-        # APROBADA: Si su vida crediticia es Alta en las 2 entidades y no es requerido por la justicia
-        elif score_dc == CreditScore.ALTA and score_cifin == CreditScore.ALTA and not has_record:
-            solicitud.estado = SolicitudEstado.APROBADA
-            solicitud.comentarios_director = "Automáticamente aprobada por excelente perfil."
-        else:
-            # If no automatic rule applies, use the director's manual decision
-            solicitud.estado = decision_manual
-            solicitud.comentarios_director = comentarios
+        # Crear Usuario y Vendedor si la decisión es APROBADA
+        extra_data = {}
+        if decision_manual == SolicitudEstado.APROBADA:
+            
+            # Generar username y password temporal
+            base_username = solicitud.correo_electronico.split('@')[0]
+            username = base_username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+            
+            # Crear usuario
+            user = User.objects.create_user(
+                username=username,
+                email=solicitud.correo_electronico,
+                password=solicitud.numero_identificacion,
+                first_name=solicitud.nombres,
+                last_name=solicitud.apellidos
+            )
+            
+            # Crear vendedor
+            solicitud_model = SolicitudModel.objects.get(id=solicitud.id)
+            VendedorModel.objects.create(
+                solicitud=solicitud_model,
+                usuario=user,
+                estado='ACTIVA'
+            )
+            
+            extra_data = {
+                'username': username,
+                'password': solicitud.numero_identificacion
+            }
 
-        return self.repository.save(solicitud)
+        # Notificar a los observadores de la decisión (envío de email)
+        subject = SolicitudDecisionSubject()
+        subject.attach(DecisionEmailObserver())
+        subject.notify_decision(solicitud, decision_manual.value, comentarios, extra_data)
+
+        return solicitud

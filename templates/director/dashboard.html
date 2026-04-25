@@ -27,6 +27,18 @@
         <h1>Dashboard del Director</h1>
     </div>
     <div class="main">
+        {% if messages %}
+        <div class="messages" style="margin-bottom: 20px;">
+            {% for message in messages %}
+            <div style="padding: 10px; border-radius: 8px; margin-bottom: 10px; 
+                 {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #F87171;
+                 {% elif message.tags == 'success' %}background: #D1FAE5; color: #065F46; border: 1px solid #34D399;
+                 {% else %}background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA;{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
             <h3>Filtrar Solicitudes</h3>
             <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
@@ -93,6 +105,7 @@
                                 <select name="decision" style="font-size: 0.8rem;">
                                     <option value="APROBADA">Aprobar</option>
                                     <option value="RECHAZADA">Rechazar</option>
+                                    <option value="DEVUELTA">Devolver</option>
                                 </select>
                                 <button type="submit" style="font-size: 0.8rem;">OK</button>
                             </form>

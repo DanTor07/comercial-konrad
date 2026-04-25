@@ -1,5 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
 
 logger = logging.getLogger('audit')
 
@@ -164,3 +168,60 @@ class SuscripcionSubject:
     def publicar_cancelacion(self, vendedor_id: int, motivo: str = ""):
         """Publica el evento de cancelacion definitiva."""
         self._publicar('CANCELADA', vendedor_id, {'motivo': motivo})
+
+
+# ── Patrón Observer — Sistema de Decisiones del Director ─────────────────────
+
+class DecisionObserver(ABC):
+    @abstractmethod
+    def on_decision(self, solicitud, decision: str, comentarios: str):
+        pass
+
+
+class DecisionEmailObserver(DecisionObserver):
+    """
+    Envía un correo HTML al vendedor cuando el director toma una decisión
+    sobre su solicitud de registro.
+    """
+    def on_decision(self, solicitud, decision: str, comentarios: str, extra_data: dict = None):
+        extra_data = extra_data or {}
+        asunto = f"Comercial Konrad - Actualización de tu solicitud de vendedor"
+        
+        context = {
+            'solicitud': solicitud,
+            'decision': decision,
+            'comentarios': comentarios,
+            'username': extra_data.get('username'),
+            'password': extra_data.get('password'),
+        }
+
+        # Renderizar la plantilla HTML
+        html_content = render_to_string('emails/decision_solicitud.html', context)
+        # Generar una versión en texto plano (fallback)
+        text_content = strip_tags(html_content)
+
+        try:
+            msg = EmailMultiAlternatives(
+                asunto,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [solicitud.correo_electronico]
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send(fail_silently=False)
+            logger.info(f"[EMAIL-DECISION] Enviado a {solicitud.correo_electronico} | Decision: {decision}")
+        except Exception as e:
+            logger.error(f"[EMAIL-DECISION] Error enviando correo a {solicitud.correo_electronico}: {e}")
+
+
+class SolicitudDecisionSubject:
+    def __init__(self):
+        self._observers: list = []
+
+    def attach(self, observer: DecisionObserver):
+        self._observers.append(observer)
+
+    def notify_decision(self, solicitud, decision: str, comentarios: str, extra_data: dict = None):
+        for obs in self._observers:
+            obs.on_decision(solicitud, decision, comentarios, extra_data)
+

@@ -1,5 +1,5 @@
 from typing import List, Optional
-from ...domain.entities.vendedor import Vendedor, SolicitudVendedor, SolicitudEstado, DocumentoAdjunto
+from ...domain.entities.vendedor import Vendedor, SolicitudVendedor, SolicitudEstado, DocumentoAdjunto, PersonaTipo
 from ...domain.ports.vendedor_repository import VendedorRepositoryPort, SolicitudVendedorRepositoryPort
 from ...models import Vendedor as VendedorModel, SolicitudVendedor as SolicitudModel, DocumentoAdjunto as DocumentoModel
 from django.contrib.auth.models import User

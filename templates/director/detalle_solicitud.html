@@ -32,6 +32,18 @@
     </div>
 
     <div class="main">
+        {% if messages %}
+        <div class="messages" style="margin-bottom: 20px;">
+            {% for message in messages %}
+            <div style="padding: 10px; border-radius: 8px; margin-bottom: 10px; 
+                 {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #F87171;
+                 {% elif message.tags == 'success' %}background: #D1FAE5; color: #065F46; border: 1px solid #34D399;
+                 {% else %}background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA;{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <!-- Estado Actual -->
         <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -128,8 +140,9 @@
                     <textarea name="comentarios" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #D1D5DB; margin-top: 8px;" rows="4" placeholder="Escriba aquí los motivos de su decisión..."></textarea>
                 </div>
                 <div style="display: flex; gap: 1rem;">
-                    <button type="submit" name="decision" value="APROBADA" style="flex: 1; padding: 12px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">APROBAR VENDEDOR</button>
-                    <button type="submit" name="decision" value="RECHAZADA" style="flex: 1; padding: 12px; background: var(--error); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">RECHAZAR SOLICITUD</button>
+                    <button type="submit" name="decision" value="APROBADA" style="flex: 1; padding: 12px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">APROBAR</button>
+                    <button type="submit" name="decision" value="DEVUELTA" style="flex: 1; padding: 12px; background: #F59E0B; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">DEVOLVER</button>
+                    <button type="submit" name="decision" value="RECHAZADA" style="flex: 1; padding: 12px; background: var(--error); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">RECHAZAR</button>
                 </div>
             </form>
         </div>
