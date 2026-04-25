@@ -74,8 +74,17 @@
     <nav>
         <div class="logo">Comercial Konrad</div>
         <div>
-            <a href="{% url 'registrar_vendedor' %}" style="margin-right: 1.5rem; text-decoration: none; color: var(--dark); font-weight: 500;">Vender</a>
-            <a href="{% url 'dashboard_director' %}" style="text-decoration: none; color: var(--dark); font-weight: 500;">Director</a>
+            {% if user.is_authenticated %}
+                {% if user.is_staff or user.is_superuser %}
+                    <a href="{% url 'dashboard_director' %}" style="margin-right: 1.5rem; text-decoration: none; color: var(--dark); font-weight: 500;">Portal Director</a>
+                {% else %}
+                    <a href="{% url 'vendedor_dashboard' %}" style="margin-right: 1.5rem; text-decoration: none; color: var(--dark); font-weight: 500;">Mi Portal</a>
+                {% endif %}
+                <a href="{% url 'logout' %}" style="text-decoration: none; color: var(--error); font-weight: 500;">Cerrar Sesión</a>
+            {% else %}
+                <a href="{% url 'registrar_vendedor' %}" style="margin-right: 1.5rem; text-decoration: none; color: var(--dark); font-weight: 500;">Vender</a>
+                <a href="{% url 'login' %}" style="text-decoration: none; color: var(--primary); font-weight: 600;">Iniciar Sesión</a>
+            {% endif %}
         </div>
     </nav>
     <section class="hero">

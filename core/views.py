@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth.decorators import login_required
 from .forms import SolicitudVendedorForm, ProductoForm
 from .infrastructure.dependencies import (
     get_registrar_solicitud_use_case,
@@ -22,10 +24,57 @@ from .infrastructure.services.monitoring import BAMService
 from .application.facades.registration_facade import RegistrationFacade
 from .application.factories.pqrs_factory import PQRSFactory
 from .application.use_cases.pqrs_use_cases import RadicarPQRSUseCase, GestionarPQRSUseCase
-from .models import SolicitudVendedor as SolicitudVendedorModel, Auditoria, PQRS as PQRSModel
+from .models import SolicitudVendedor as SolicitudVendedorModel, Auditoria, PQRS as PQRSModel, Suscripcion, Producto as ProductoModel
 
 def home(request):
     return render(request, 'inicio.html')
+
+def custom_login(request):
+    if request.user.is_authenticated:
+        if request.user.is_superuser or request.user.is_staff:
+            return redirect('dashboard_director')
+        elif hasattr(request.user, 'vendedor_profile'):
+            return redirect('vendedor_dashboard')
+        return redirect('inicio')
+
+    if request.method == 'POST':
+        u = request.POST.get('username')
+        p = request.POST.get('password')
+        user = authenticate(request, username=u, password=p)
+        if user is not None:
+            auth_login(request, user)
+            messages.success(request, f'¡Bienvenido de nuevo, {user.first_name}!')
+            if user.is_superuser or user.is_staff:
+                return redirect('dashboard_director')
+            elif hasattr(user, 'vendedor_profile'):
+                return redirect('vendedor_dashboard')
+            else:
+                return redirect('inicio')
+        else:
+            messages.error(request, 'Credenciales inválidas. Por favor intente nuevamente.')
+    
+    return render(request, 'login.html')
+
+def custom_logout(request):
+    auth_logout(request)
+    return redirect('login')
+
+@login_required(login_url='login')
+def vendedor_dashboard(request):
+    if not hasattr(request.user, 'vendedor_profile'):
+        messages.error(request, 'No tienes un perfil de vendedor asociado.')
+        return redirect('inicio')
+    
+    vendedor = request.user.vendedor_profile
+    suscripcion = Suscripcion.objects.filter(vendedor=vendedor).order_by('-fecha_inicio').first()
+    productos = ProductoModel.objects.filter(vendedor=vendedor)
+    
+    context = {
+        'vendedor': vendedor,
+        'suscripcion': suscripcion,
+        'productos': productos
+    }
+    return render(request, 'vendedor_dashboard.html', context)
 
 def registrar_vendedor(request):
     if request.method == 'POST':

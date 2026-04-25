@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="padding: 2rem 5%; max-width: 1200px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1 style="color: var(--primary);">Portal del Vendedor</h1>
+        <div>
+            <span style="background: var(--light); padding: 8px 15px; border-radius: 20px; font-weight: 600; margin-right: 15px;">
+                Estado: 
+                {% if vendedor.estado == 'ACTIVA' %}
+                    <span style="color: var(--success);">ACTIVA</span>
+                {% elif vendedor.estado == 'EN MORA' %}
+                    <span style="color: var(--error);">EN MORA</span>
+                {% else %}
+                    <span style="color: var(--accent);">{{ vendedor.estado }}</span>
+                {% endif %}
+            </span>
+            <a href="{% url 'logout' %}" style="text-decoration: none; color: var(--error); font-weight: 600;">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    {% if messages %}
+    <div class="messages" style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div style="padding: 10px; border-radius: 8px; margin-bottom: 10px; 
+             {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #F87171;
+             {% elif message.tags == 'success' %}background: #D1FAE5; color: #065F46; border: 1px solid #34D399;
+             {% else %}background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA;{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+        <!-- Panel Izquierdo: Suscripción y Perfil -->
+        <div>
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
+                <h3 style="margin-top: 0; color: var(--dark); border-bottom: 2px solid var(--light); padding-bottom: 10px;">Tu Suscripción</h3>
+                
+                {% if not suscripcion or not suscripcion.esta_activa %}
+                <div style="background: #FEF3C7; border: 1px solid #F59E0B; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <h4 style="color: #B45309; margin-top: 0;">Suscripción Pendiente</h4>
+                    <p style="font-size: 0.9rem; color: #92400E;">Para poder publicar productos y vender en Comercial Konrad, debes realizar el pago de tu primera suscripción.</p>
+                    
+                    <form method="POST" action="#" style="margin-top: 15px;">
+                        {% csrf_token %}
+                        <select name="plan" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #D1D5DB;">
+                            <option value="MENSUAL">Plan Mensual - $50.000 COP</option>
+                            <option value="SEMESTRAL">Plan Semestral - $250.000 COP</option>
+                            <option value="ANUAL">Plan Anual - $450.000 COP</option>
+                        </select>
+                        <button type="button" onclick="alert('Simulación de pasarela de pagos. ¡Suscripción activada con éxito!')" style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                            Pagar Suscripción
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div style="margin-top: 15px;">
+                    <p><strong>Plan:</strong> {{ suscripcion.tipo_facturacion }}</p>
+                    <p><strong>Inició:</strong> {{ suscripcion.fecha_inicio|date:"d M Y" }}</p>
+                    <p><strong>Vence:</strong> {{ suscripcion.fecha_fin|date:"d M Y" }}</p>
+                    <span style="display: inline-block; padding: 5px 10px; background: #D1FAE5; color: #065F46; border-radius: 15px; font-size: 0.8rem; font-weight: 600;">AL DÍA</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: var(--dark); border-bottom: 2px solid var(--light); padding-bottom: 10px;">Métricas</h3>
+                <p><strong>Calificación Promedio:</strong> ⭐ {{ vendedor.calificacion_promedio }}</p>
+                <p><strong>Calificaciones Bajas:</strong> {{ vendedor.numero_calificaciones_bajas }}</p>
+                <p><strong>Productos Publicados:</strong> {{ productos|length }}</p>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Gestión de Productos -->
+        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--light); padding-bottom: 10px; margin-bottom: 20px;">
+                <h3 style="margin: 0; color: var(--dark);">Mis Productos</h3>
+                <a href="{% url 'create_product' %}" style="padding: 8px 15px; background: var(--secondary); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.9rem;">
+                    + Nuevo Producto
+                </a>
+            </div>
+
+            {% if productos %}
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background: var(--light);">
+                        <th style="padding: 12px; border-bottom: 2px solid #E5E7EB;">Producto</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #E5E7EB;">Precio</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #E5E7EB;">Stock</th>
+                        <th style="padding: 12px; border-bottom: 2px solid #E5E7EB;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in productos %}
+                    <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">
+                            <strong>{{ p.nombre }}</strong><br>
+                            <small style="color: #6B7280;">{{ p.categoria.nombre }}</small>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">${{ p.valor_unitario }}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">{{ p.cantidad_disponible }}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">
+                            <a href="#" style="color: var(--primary); text-decoration: none; margin-right: 10px;">Editar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div style="text-align: center; padding: 40px 20px; color: #6B7280;">
+                <p>No tienes productos publicados actualmente.</p>
+                {% if not suscripcion or not suscripcion.esta_activa %}
+                <p style="font-size: 0.9rem; color: #991B1B;">Paga tu suscripción para poder publicar.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
