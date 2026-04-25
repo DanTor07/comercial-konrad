@@ -43,17 +43,27 @@
                     <h4 style="color: #B45309; margin-top: 0;">Suscripción Pendiente</h4>
                     <p style="font-size: 0.9rem; color: #92400E;">Para poder publicar productos y vender en Comercial Konrad, debes realizar el pago de tu primera suscripción.</p>
                     
-                    <form method="POST" action="#" style="margin-top: 15px;">
+                    <form method="POST" action="{% url 'pagar_suscripcion' %}" style="margin-top: 15px;">
                         {% csrf_token %}
-                        <select name="plan" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #D1D5DB;">
+                        <label for="plan" style="font-weight: 600; font-size: 0.9rem;">Elige tu plan:</label>
+                        <select id="plan" name="plan" style="width: 100%; padding: 10px; margin-bottom: 15px; margin-top: 5px; border-radius: 6px; border: 1px solid #D1D5DB;">
                             <option value="MENSUAL">Plan Mensual - $50.000 COP</option>
                             <option value="SEMESTRAL">Plan Semestral - $250.000 COP</option>
                             <option value="ANUAL">Plan Anual - $450.000 COP</option>
                         </select>
-                        <button type="button" onclick="alert('Simulación de pasarela de pagos. ¡Suscripción activada con éxito!')" style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+
+                        <label for="metodo_pago" style="font-weight: 600; font-size: 0.9rem;">Método de pago:</label>
+                        <select id="metodo_pago" name="metodo_pago" style="width: 100%; padding: 10px; margin-bottom: 15px; margin-top: 5px; border-radius: 6px; border: 1px solid #D1D5DB;">
+                            <option value="LINEA">Pagos en Línea (PSE / Web)</option>
+                            <option value="TARJETA">Tarjeta de Crédito</option>
+                            <option value="CONSIGNACION">Consignación Bancaria</option>
+                        </select>
+
+                        <button type="submit" style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.3s;">
                             Pagar Suscripción
                         </button>
                     </form>
+
                 </div>
                 {% else %}
                 <div style="margin-top: 15px;">

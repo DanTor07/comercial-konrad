@@ -5,7 +5,7 @@ from core.views import (
     procesar_solicitud, detalle_solicitud, catalog, add_to_cart,
     view_cart, create_product, checkout, bam_dashboard,
     gestionar_suscripcion, custom_login, custom_logout, vendedor_dashboard,
-    crear_pqrs, listar_pqrs, detalle_pqrs, gestion_pqrs
+    crear_pqrs, listar_pqrs, detalle_pqrs, gestion_pqrs, pagar_suscripcion, consultar_estado
 )
 from core.interfaces.api.api_views import get_simulated_sales, get_simulated_sellers
 from django.conf import settings
@@ -17,6 +17,7 @@ urlpatterns = [
     path('login/', custom_login, name='login'),
     path('logout/', custom_logout, name='logout'),
     path('vendedor/dashboard/', vendedor_dashboard, name='vendedor_dashboard'),
+    path('vendedor/pagar/', pagar_suscripcion, name='pagar_suscripcion'),
     path('catalog/', catalog, name='catalog'),
     path('catalog/new/', create_product, name='create_product'),
     path('cart/', view_cart, name='view_cart'),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('checkout/', checkout, name='checkout'),
     path('bam/', bam_dashboard, name='bam_dashboard'),
     path('registrar-vendedor/', registrar_vendedor, name='registrar_vendedor'),
+    path('consultar-estado/', consultar_estado, name='consultar_estado'),
     path('director/', dashboard_director, name='dashboard_director'),
     path('director/solicitud/<int:solicitud_id>/', procesar_solicitud, name='procesar_solicitud'),
     path('director/detalle/<int:solicitud_id>/', detalle_solicitud, name='detalle_solicitud'),

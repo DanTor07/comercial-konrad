@@ -62,7 +62,7 @@ class ProcesarDecisionSolicitudUseCase:
             VendedorModel.objects.create(
                 solicitud=solicitud_model,
                 usuario=user,
-                estado='ACTIVA'
+                estado='PROCESO'
             )
             
             extra_data = {

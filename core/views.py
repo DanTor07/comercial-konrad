@@ -76,6 +76,55 @@ def vendedor_dashboard(request):
     }
     return render(request, 'vendedor_dashboard.html', context)
 
+@login_required(login_url='login')
+def pagar_suscripcion(request):
+    if request.method == 'POST':
+        if not hasattr(request.user, 'vendedor_profile'):
+            messages.error(request, 'No eres un vendedor.')
+            return redirect('inicio')
+            
+        plan = request.POST.get('plan')
+        metodo = request.POST.get('metodo_pago')
+        
+        vendedor = request.user.vendedor_profile
+        
+        # Simulación del uso de la estrategia de pago basada en el punto 3
+        # Aquí se reutiliza la lógica de los patrones implementados para el carrito
+        try:
+            # Simulamos que la pasarela retorna éxito para cualquiera de los 3 métodos
+            # (En producción esto usaría las estrategias como OnlinePaymentStrategy, etc.)
+            metodo_pago_enum = MetodoPago(metodo)
+            
+            from datetime import timedelta
+            from django.utils import timezone
+            
+            # Registrar la suscripción
+            hoy = timezone.now()
+            if plan == 'MENSUAL':
+                fin = hoy + timedelta(days=30)
+            elif plan == 'SEMESTRAL':
+                fin = hoy + timedelta(days=180)
+            else:
+                fin = hoy + timedelta(days=365)
+                
+            Suscripcion.objects.create(
+                vendedor=vendedor,
+                fecha_inicio=hoy,
+                fecha_fin=fin,
+                tipo_facturacion=plan,
+                esta_activa=True
+            )
+            
+            # Actualizar estado del vendedor a ACTIVA
+            vendedor.estado = 'ACTIVA'
+            vendedor.save()
+            
+            messages.success(request, f'¡Suscripción pagada exitosamente usando {metodo_pago_enum.value}! Ya puedes publicar tus productos.')
+        except Exception as e:
+            messages.error(request, f'Error procesando el pago: {e}')
+            
+    return redirect('vendedor_dashboard')
+
 def registrar_vendedor(request):
     if request.method == 'POST':
         form = SolicitudVendedorForm(request.POST, request.FILES)
@@ -110,6 +159,20 @@ def registrar_vendedor(request):
     else:
         form = SolicitudVendedorForm()
     return render(request, 'registrar_vendedor.html', {'form': form})
+
+def consultar_estado(request):
+    if request.method == 'POST':
+        numero_id = request.POST.get('numero_identificacion')
+        try:
+            solicitud = SolicitudVendedorModel.objects.filter(numero_identificacion=numero_id).order_by('-fecha_creacion').first()
+            if solicitud:
+                return render(request, 'consultar_estado.html', {'solicitud': solicitud, 'busqueda': True})
+            else:
+                messages.error(request, 'No se encontró ninguna solicitud con ese número de identificación.')
+        except Exception as e:
+            messages.error(request, 'Ocurrió un error consultando la solicitud.')
+            
+    return render(request, 'consultar_estado.html', {'busqueda': False})
 
 def dashboard_director(request):
     query = request.GET.get('q')
