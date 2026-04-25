@@ -5,7 +5,8 @@ from core.views import (
     procesar_solicitud, detalle_solicitud, catalog, add_to_cart,
     view_cart, create_product, checkout, bam_dashboard,
     gestionar_suscripcion, custom_login, custom_logout, vendedor_dashboard,
-    crear_pqrs, listar_pqrs, detalle_pqrs, gestion_pqrs, pagar_suscripcion, consultar_estado
+    crear_pqrs, listar_pqrs, detalle_pqrs, gestion_pqrs, 
+    iniciar_pago_suscripcion, pago_en_linea, pago_tarjeta, pago_consignacion, consultar_estado
 )
 from core.interfaces.api.api_views import get_simulated_sales, get_simulated_sellers
 from django.conf import settings
@@ -17,7 +18,10 @@ urlpatterns = [
     path('login/', custom_login, name='login'),
     path('logout/', custom_logout, name='logout'),
     path('vendedor/dashboard/', vendedor_dashboard, name='vendedor_dashboard'),
-    path('vendedor/pagar/', pagar_suscripcion, name='pagar_suscripcion'),
+    path('vendedor/pagar/', iniciar_pago_suscripcion, name='iniciar_pago_suscripcion'),
+    path('vendedor/pagar/en-linea/', pago_en_linea, name='pago_en_linea'),
+    path('vendedor/pagar/tarjeta/', pago_tarjeta, name='pago_tarjeta'),
+    path('vendedor/pagar/consignacion/', pago_consignacion, name='pago_consignacion'),
     path('catalog/', catalog, name='catalog'),
     path('catalog/new/', create_product, name='create_product'),
     path('cart/', view_cart, name='view_cart'),

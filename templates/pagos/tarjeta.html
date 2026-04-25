@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh; background-color: var(--light);">
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px;">
+        <h2 style="color: var(--primary); margin: 0 0 10px 0; text-align: center;">Pago con Tarjeta de Crédito</h2>
+        <p style="text-align: center; color: #6B7280; margin-bottom: 30px;">Plan: {{ plan }} | Valor a pagar: ${{ precio }}</p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Nombre en la Tarjeta:</label>
+                <input type="text" name="nombre_tarjeta" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #D1D5DB;" placeholder="Ej. Juan Pérez">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 8px;">Número de Tarjeta:</label>
+                <input type="text" name="numero_tarjeta" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #D1D5DB;" placeholder="XXXX XXXX XXXX XXXX">
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Vencimiento:</label>
+                    <input type="text" name="vencimiento" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #D1D5DB;" placeholder="MM/YY">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">CVV:</label>
+                    <input type="password" name="cvv" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #D1D5DB;" placeholder="XXX">
+                </div>
+                <div style="flex: 1;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px;">Cuotas:</label>
+                    <select name="cuotas" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #D1D5DB;">
+                        <option value="1">1</option>
+                        <option value="6">6</option>
+                        <option value="12">12</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" style="width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                Procesar Pago
+            </button>
+            <a href="{% url 'vendedor_dashboard' %}" style="display: block; text-align: center; margin-top: 15px; color: var(--error); text-decoration: none;">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

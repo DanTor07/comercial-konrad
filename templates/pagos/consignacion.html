@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh; background-color: var(--light);">
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 600px;">
+        <h2 style="color: var(--primary); margin: 0 0 10px 0; text-align: center;">Recibo de Consignación</h2>
+        <p style="text-align: center; color: #6B7280; margin-bottom: 30px;">Imprime este recibo y dirígete a cualquier sucursal bancaria.</p>
+        
+        <div style="border: 2px dashed #D1D5DB; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-family: monospace;">
+            <h3 style="text-align: center; margin-top: 0;">Banco Konrad - Recaudo Empresarial</h3>
+            <p><strong>Referencia de Pago (ID Vendedor):</strong> {{ vendedor.solicitud.numero_identificacion }}</p>
+            <p><strong>Nombre:</strong> {{ vendedor.solicitud.nombres }} {{ vendedor.solicitud.apellidos }}</p>
+            <p><strong>Concepto:</strong> Pago Suscripción {{ plan }}</p>
+            <p><strong>Valor a Pagar:</strong> ${{ precio }} COP</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <img src="https://barcode.tec-it.com/barcode.ashx?data={{ vendedor.solicitud.numero_identificacion }}{{ precio }}&code=Code128&dpi=96" alt="Barcode" style="max-width: 100%;">
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button type="button" onclick="window.print()" style="padding: 10px 20px; background: #475569; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">
+                🖨️ Imprimir Recibo
+            </button>
+            <a href="{% url 'vendedor_dashboard' %}" style="text-decoration: none; color: var(--primary); font-weight: bold;">Volver al Tablero</a>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #E5E7EB; margin-bottom: 20px;">
+        
+        <div style="background: #F9FAFB; padding: 15px; border-radius: 8px; border: 1px solid #E5E7EB; margin-top: 20px;">
+            <h4 style="color: var(--dark); margin-top: 0;">Sincronización de Recaudos Bancarios</h4>
+            <p style="font-size: 0.85rem; color: #6B7280;">El sistema procesa y lee automáticamente los archivos enviados por el banco cada 24 horas. Puedes forzar la lectura manual del archivo de consolidación para validar tu consignación si el banco ya la ha reportado.</p>
+            <form method="POST">
+                {% csrf_token %}
+                <button type="submit" style="width: 100%; padding: 10px; background-color: #4F46E5; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+                    Ejecutar Proceso de Lectura de Archivos
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

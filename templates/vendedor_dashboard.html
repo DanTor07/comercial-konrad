@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div style="padding: 2rem 5%; max-width: 1200px; margin: 0 auto;">
+<div style="padding: 2rem 5%; max-width: 1200px; margin: 0 auto; color: #1F2937; text-align: left;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <h1 style="color: var(--primary);">Portal del Vendedor</h1>
         <div>
@@ -43,7 +43,7 @@
                     <h4 style="color: #B45309; margin-top: 0;">Suscripción Pendiente</h4>
                     <p style="font-size: 0.9rem; color: #92400E;">Para poder publicar productos y vender en Comercial Konrad, debes realizar el pago de tu primera suscripción.</p>
                     
-                    <form method="POST" action="{% url 'pagar_suscripcion' %}" style="margin-top: 15px;">
+                    <form method="POST" action="{% url 'iniciar_pago_suscripcion' %}" style="margin-top: 15px;">
                         {% csrf_token %}
                         <label for="plan" style="font-weight: 600; font-size: 0.9rem;">Elige tu plan:</label>
                         <select id="plan" name="plan" style="width: 100%; padding: 10px; margin-bottom: 15px; margin-top: 5px; border-radius: 6px; border: 1px solid #D1D5DB;">

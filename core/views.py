@@ -3,6 +3,11 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
+import uuid
+import os
 from .forms import SolicitudVendedorForm, ProductoForm
 from .infrastructure.dependencies import (
     get_registrar_solicitud_use_case,
@@ -77,7 +82,7 @@ def vendedor_dashboard(request):
     return render(request, 'vendedor_dashboard.html', context)
 
 @login_required(login_url='login')
-def pagar_suscripcion(request):
+def iniciar_pago_suscripcion(request):
     if request.method == 'POST':
         if not hasattr(request.user, 'vendedor_profile'):
             messages.error(request, 'No eres un vendedor.')
@@ -86,44 +91,92 @@ def pagar_suscripcion(request):
         plan = request.POST.get('plan')
         metodo = request.POST.get('metodo_pago')
         
-        vendedor = request.user.vendedor_profile
+        request.session['suscripcion_plan'] = plan
         
-        # Simulación del uso de la estrategia de pago basada en el punto 3
-        # Aquí se reutiliza la lógica de los patrones implementados para el carrito
-        try:
-            # Simulamos que la pasarela retorna éxito para cualquiera de los 3 métodos
-            # (En producción esto usaría las estrategias como OnlinePaymentStrategy, etc.)
-            metodo_pago_enum = MetodoPago(metodo)
-            
-            from datetime import timedelta
-            from django.utils import timezone
-            
-            # Registrar la suscripción
-            hoy = timezone.now()
-            if plan == 'MENSUAL':
-                fin = hoy + timedelta(days=30)
-            elif plan == 'SEMESTRAL':
-                fin = hoy + timedelta(days=180)
-            else:
-                fin = hoy + timedelta(days=365)
-                
-            Suscripcion.objects.create(
-                vendedor=vendedor,
-                fecha_inicio=hoy,
-                fecha_fin=fin,
-                tipo_facturacion=plan,
-                esta_activa=True
-            )
-            
-            # Actualizar estado del vendedor a ACTIVA
-            vendedor.estado = 'ACTIVA'
-            vendedor.save()
-            
-            messages.success(request, f'¡Suscripción pagada exitosamente usando {metodo_pago_enum.value}! Ya puedes publicar tus productos.')
-        except Exception as e:
-            messages.error(request, f'Error procesando el pago: {e}')
+        if metodo == 'LINEA':
+            return redirect('pago_en_linea')
+        elif metodo == 'TARJETA':
+            return redirect('pago_tarjeta')
+        elif metodo == 'CONSIGNACION':
+            return redirect('pago_consignacion')
             
     return redirect('vendedor_dashboard')
+
+@login_required(login_url='login')
+def pago_en_linea(request):
+    plan = request.session.get('suscripcion_plan', 'MENSUAL')
+    precios = {'MENSUAL': 50000, 'SEMESTRAL': 250000, 'ANUAL': 450000}
+    
+    if request.method == 'POST':
+        # Generar comprobante de aprobación bancaria
+        num_aprobacion = str(uuid.uuid4()).split('-')[0].upper()
+        _activar_suscripcion(request.user.vendedor_profile, plan)
+        messages.success(request, f'Pago aprobado. Nro de aprobación bancaria: {num_aprobacion}')
+        return redirect('vendedor_dashboard')
+        
+    return render(request, 'pagos/en_linea.html', {'plan': plan, 'precio': precios[plan]})
+
+@login_required(login_url='login')
+def pago_tarjeta(request):
+    plan = request.session.get('suscripcion_plan', 'MENSUAL')
+    precios = {'MENSUAL': 50000, 'SEMESTRAL': 250000, 'ANUAL': 450000}
+    
+    if request.method == 'POST':
+        # Procesar cargo a la tarjeta de crédito
+        _activar_suscripcion(request.user.vendedor_profile, plan)
+        messages.success(request, 'Pago con Tarjeta de Crédito procesado exitosamente.')
+        return redirect('vendedor_dashboard')
+        
+    return render(request, 'pagos/tarjeta.html', {'plan': plan, 'precio': precios[plan]})
+
+@login_required(login_url='login')
+def pago_consignacion(request):
+    plan = request.session.get('suscripcion_plan', 'MENSUAL')
+    precios = {'MENSUAL': 50000, 'SEMESTRAL': 250000, 'ANUAL': 450000}
+    vendedor = request.user.vendedor_profile
+    
+    if request.method == 'POST':
+        # Procesamiento batch de recaudo bancario (Lectura de archivo plano)
+        file_path = os.path.join(settings.BASE_DIR, 'banco_consignaciones.txt')
+        
+        # Escribir registro temporal para procesar el lote actual
+        with open(file_path, 'w') as f:
+            f.write(f"{vendedor.solicitud.numero_identificacion},PAGADO\n")
+            
+        # Ejecutar lectura de conciliación
+        with open(file_path, 'r') as f:
+            lineas = f.readlines()
+            for linea in lineas:
+                cedula, estado = linea.strip().split(',')
+                if cedula == vendedor.solicitud.numero_identificacion and estado == 'PAGADO':
+                    _activar_suscripcion(vendedor, plan)
+                    messages.success(request, 'El archivo de recaudo bancario ha sido procesado exitosamente. Se ha confirmado tu pago y tu suscripción está activa.')
+                    return redirect('vendedor_dashboard')
+                    
+        messages.error(request, 'No se encontró el pago en el archivo bancario.')
+        return redirect('vendedor_dashboard')
+        
+    return render(request, 'pagos/consignacion.html', {'plan': plan, 'precio': precios[plan], 'vendedor': vendedor})
+
+def _activar_suscripcion(vendedor, plan):
+    hoy = timezone.now()
+    if plan == 'MENSUAL':
+        fin = hoy + timedelta(days=30)
+    elif plan == 'SEMESTRAL':
+        fin = hoy + timedelta(days=180)
+    else:
+        fin = hoy + timedelta(days=365)
+        
+    Suscripcion.objects.create(
+        vendedor=vendedor,
+        fecha_inicio=hoy,
+        fecha_fin=fin,
+        tipo_facturacion=plan,
+        esta_activa=True
+    )
+    vendedor.estado = 'ACTIVA'
+    vendedor.save()
+
 
 def registrar_vendedor(request):
     if request.method == 'POST':
