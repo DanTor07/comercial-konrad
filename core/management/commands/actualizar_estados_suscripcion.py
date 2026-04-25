@@ -18,7 +18,16 @@ class Command(BaseCommand):
         actualizados_cancelada = 0
 
         for vendedor in vendedores:
-            # Obtener la suscripción más reciente
+            # Cancelación por baja calificación
+            if vendedor.numero_calificaciones_bajas >= 10 or (vendedor.calificacion_promedio > 0 and vendedor.calificacion_promedio < 5):
+                vendedor.estado = 'CANCELADA'
+                vendedor.save()
+                actualizados_cancelada += 1
+                self.enviar_correo_cancelacion_por_calificacion(vendedor)
+                self.stdout.write(self.style.ERROR(f"Vendedor {vendedor.solicitud.numero_identificacion} pasado a CANCELADA por malas calificaciones."))
+                continue
+
+            # Obtener la suscripción más reciente para validación de mora
             ultima_suscripcion = Suscripcion.objects.filter(vendedor=vendedor).order_by('-fecha_fin').first()
             
             if not ultima_suscripcion:
@@ -123,6 +132,49 @@ class Command(BaseCommand):
         mensaje_plano = (
             f"Hola {vendedor.solicitud.nombres},\n\n"
             f"Tu cuenta ha sido CANCELADA tras superar el periodo de mora sin pago.\n"
+        )
+        try:
+            send_mail(
+                asunto,
+                mensaje_plano,
+                settings.DEFAULT_FROM_EMAIL,
+                [vendedor.solicitud.correo_electronico],
+                html_message=html_mensaje,
+                fail_silently=True,
+            )
+        except Exception as e:
+            self.stderr.write(f"Error enviando correo a {vendedor.solicitud.correo_electronico}: {e}")
+
+    def enviar_correo_cancelacion_por_calificacion(self, vendedor):
+        asunto = '🚫 Tu cuenta ha sido CANCELADA por bajo rendimiento'
+        
+        html_mensaje = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 8px; border-top: 5px solid #DC2626; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h2 style="color: #DC2626; text-align: center;">Cuenta Cancelada por Calificaciones</h2>
+                <p style="font-size: 16px; color: #333333;">Hola <strong>{vendedor.solicitud.nombres} {vendedor.solicitud.apellidos}</strong>,</p>
+                <p style="font-size: 16px; color: #333333;">
+                    Te informamos que debido a que tu cuenta ha acumulado <strong>10 calificaciones por debajo de 3</strong> o tu <strong>promedio ha bajado de 5</strong>, 
+                    tu cuenta de vendedor en Comercial Konrad ha sido <strong>CANCELADA definitivamente</strong>.
+                </p>
+                <p style="font-size: 16px; color: #333333;">
+                    Para Comercial Konrad es indispensable mantener altos estándares de calidad y servicio para nuestros clientes.
+                    A partir de este momento, tus productos han sido retirados del catálogo público y no podrás acceder a tu portal de ventas.
+                </p>
+                <hr style="border: none; border-top: 1px solid #eeeeee; margin-top: 30px;">
+                <p style="font-size: 12px; color: #999999; text-align: center;">
+                    Este es un correo automático, por favor no respondas a este mensaje.<br>
+                    © 2026 Comercial Konrad.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        mensaje_plano = (
+            f"Hola {vendedor.solicitud.nombres},\n\n"
+            f"Tu cuenta ha sido CANCELADA debido a bajo rendimiento en tus calificaciones.\n"
         )
         try:
             send_mail(
