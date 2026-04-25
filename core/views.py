@@ -297,7 +297,7 @@ def view_cart(request):
 
 def create_product(request):
     if request.method == 'POST':
-        form = ProductoForm(request.POST)
+        form = ProductoForm(request.POST, request.FILES)
         if form.is_valid():
             # Resolver vendedor_id del usuario autenticado
             vendedor_id = 1  # fallback
@@ -313,12 +313,12 @@ def create_product(request):
                 categoria_id=form.cleaned_data['categoria'].id,
                 subcategoria=form.cleaned_data['subcategoria'],
                 marca=form.cleaned_data['marca'],
-                es_original=form.cleaned_data['es_original'],
+                es_original=form.cleaned_data['es_original'] == 'True' or form.cleaned_data['es_original'] is True,
                 color=form.cleaned_data['color'],
                 tamano=form.cleaned_data['tamano'],
                 peso=float(form.cleaned_data['peso']),
                 talla=form.cleaned_data['talla'],
-                es_nuevo=form.cleaned_data['es_nuevo'],
+                es_nuevo=form.cleaned_data['es_nuevo'] == 'True' or form.cleaned_data['es_nuevo'] is True,
                 vendedor_id=vendedor_id,
                 cantidad_disponible=form.cleaned_data['cantidad_disponible'],
                 valor_unitario=float(form.cleaned_data['valor_unitario']),
@@ -332,9 +332,16 @@ def create_product(request):
                     vendedor_id=vendedor_id,
                     usuario_id=request.user.id if request.user.is_authenticated else None
                 )
-                use_case.execute(producto_domain)
+                producto_guardado = use_case.execute(producto_domain)
+                
+                # Guardar imagenes adjuntas
+                imagenes = request.FILES.getlist('imagenes_producto')
+                for img in imagenes:
+                    from core.models import ProductoImagen
+                    ProductoImagen.objects.create(producto_id=producto_guardado.id, imagen=img)
+
                 messages.success(request, 'Producto publicado exitosamente.')
-                return redirect('catalog')
+                return redirect('vendedor_dashboard')
             except PermissionError as e:
                 messages.error(request, str(e))
     else:

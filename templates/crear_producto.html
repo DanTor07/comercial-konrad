@@ -18,19 +18,42 @@
 <body>
     <div class="container">
         <h1>Publicar Nuevo Producto</h1>
-        <form method="POST">
+        {% if messages %}
+            <div style="margin-bottom: 20px;">
+                {% for message in messages %}
+                <div style="padding: 10px; border-radius: 8px; margin-bottom: 10px; 
+                     {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #F87171;
+                     {% else %}background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA;{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+            <div style="color: red; margin-bottom: 1rem;">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 {% for field in form %}
-                    <div class="form-group">
+                    <div class="form-group" {% if field.name == 'caracteristicas' or field.name == 'imagenes_producto' %}style="grid-column: 1 / -1;"{% endif %}>
                         <label>{{ field.label }}</label>
                         {{ field }}
+                        {% if field.errors %}
+                            <div style="color: red; font-size: 0.85rem; margin-top: 5px;">
+                                {{ field.errors|striptags }}
+                            </div>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
             <button type="submit" class="btn-submit">Publicar Producto</button>
         </form>
-        <p style="margin-top: 1.5rem;"><a href="{% url 'catalog' %}" style="color: var(--primary);">← Volver al catálogo</a></p>
+        <p style="margin-top: 1.5rem;"><a href="{% url 'vendedor_dashboard' %}" style="color: var(--primary);">← Volver al Portal del Vendedor</a></p>
     </div>
 </body>
 </html>

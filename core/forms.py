@@ -56,7 +56,40 @@ class SolicitudVendedorForm(forms.ModelForm):
         
         return cleaned_data
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput(attrs={'class': 'form-control', 'multiple': True}))
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
 class ProductoForm(forms.ModelForm):
+    es_original = forms.TypedChoiceField(
+        choices=[('True', 'Sí'), ('False', 'No')],
+        coerce=lambda x: x == 'True',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="¿Es original?"
+    )
+    es_nuevo = forms.TypedChoiceField(
+        choices=[('True', 'Sí'), ('False', 'No')],
+        coerce=lambda x: x == 'True',
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="¿Es nuevo?"
+    )
+    imagenes_producto = MultipleFileField(
+        required=False,
+        label="Imágenes del producto"
+    )
+
     class Meta:
         model = Producto
         fields = [
@@ -64,14 +97,19 @@ class ProductoForm(forms.ModelForm):
             'color', 'tamano', 'peso', 'talla', 'es_nuevo', 
             'cantidad_disponible', 'valor_unitario', 'caracteristicas'
         ]
+        labels = {
+            'tamano': 'Tamaño (cm)',
+            'peso': 'Peso (kg)',
+            'valor_unitario': 'Valor Unitario (COP)',
+        }
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'categoria': forms.Select(attrs={'class': 'form-select'}),
             'subcategoria': forms.TextInput(attrs={'class': 'form-control'}),
             'marca': forms.TextInput(attrs={'class': 'form-control'}),
             'color': forms.TextInput(attrs={'class': 'form-control'}),
-            'tamano': forms.TextInput(attrs={'class': 'form-control'}),
-            'peso': forms.NumberInput(attrs={'class': 'form-control'}),
+            'tamano': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 15x10'}),
+            'peso': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'talla': forms.TextInput(attrs={'class': 'form-control'}),
             'cantidad_disponible': forms.NumberInput(attrs={'class': 'form-control'}),
             'valor_unitario': forms.NumberInput(attrs={'class': 'form-control'}),
