@@ -5,6 +5,7 @@ from ...domain.services.notifications import (
     SuscripcionBlockerObserver,
 )
 from ...models import Suscripcion as SuscripcionModel, Vendedor as VendedorModel
+from ....core import constants
 
 
 class GestionarSuscripcionUseCase:
@@ -48,7 +49,7 @@ class GestionarSuscripcionUseCase:
 
         return {
             'success': True,
-            'estado': 'EN MORA',
+            'estado': constants.ESTADO_VENDEDOR_MORA,
             'message': f'Vendedor #{vendedor_id} marcado en mora.'
         }
 
@@ -70,7 +71,7 @@ class GestionarSuscripcionUseCase:
 
         return {
             'success': True,
-            'estado': 'ACTIVA',
+            'estado': constants.ESTADO_VENDEDOR_ACTIVO,
             'message': f'Suscripcion del Vendedor #{vendedor_id} reactivada.'
         }
 
@@ -84,6 +85,6 @@ class GestionarSuscripcionUseCase:
 
         return {
             'success': True,
-            'estado': 'CANCELADA',
+            'estado': constants.ESTADO_VENDEDOR_CANCELADO,
             'message': f'Suscripcion del Vendedor #{vendedor_id} cancelada. Motivo: {motivo}'
         }

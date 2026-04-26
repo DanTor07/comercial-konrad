@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
 from core.models import Vendedor, Suscripcion
+from core import constants
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -12,15 +13,15 @@ class Command(BaseCommand):
         hoy = timezone.now()
         un_mes_atras = hoy - timedelta(days=30)
         
-        vendedores = Vendedor.objects.filter(estado__in=['ACTIVA', 'EN MORA'])
+        vendedores = Vendedor.objects.filter(estado__in=[constants.ESTADO_VENDEDOR_ACTIVO, constants.ESTADO_VENDEDOR_MORA])
         
         actualizados_mora = 0
         actualizados_cancelada = 0
 
         for vendedor in vendedores:
             # Cancelación por baja calificación
-            if vendedor.numero_calificaciones_bajas >= 10 or (vendedor.calificacion_promedio > 0 and vendedor.calificacion_promedio < 5):
-                vendedor.estado = 'CANCELADA'
+            if vendedor.numero_calificaciones_bajas >= constants.CALIFICACION_MAX_BAJAS or (vendedor.calificacion_promedio > 0 and vendedor.calificacion_promedio < constants.CALIFICACION_MIN_PROMEDIO):
+                vendedor.estado = constants.ESTADO_VENDEDOR_CANCELADO
                 vendedor.save()
                 actualizados_cancelada += 1
                 self.enviar_correo_cancelacion_por_calificacion(vendedor)
@@ -34,8 +35,8 @@ class Command(BaseCommand):
                 continue
 
             # Si el vendedor está activo y ya pasó la fecha de fin (al menos un día)
-            if vendedor.estado == 'ACTIVA' and ultima_suscripcion.fecha_fin < hoy:
-                vendedor.estado = 'EN MORA'
+            if vendedor.estado == constants.ESTADO_VENDEDOR_ACTIVO and ultima_suscripcion.fecha_fin < hoy:
+                vendedor.estado = constants.ESTADO_VENDEDOR_MORA
                 ultima_suscripcion.esta_activa = False
                 ultima_suscripcion.save()
                 vendedor.save()
@@ -44,8 +45,8 @@ class Command(BaseCommand):
                 self.enviar_correo_mora(vendedor)
                 self.stdout.write(self.style.WARNING(f"Vendedor {vendedor.solicitud.numero_identificacion} pasado a EN MORA."))
 
-            elif vendedor.estado == 'EN MORA' and ultima_suscripcion.fecha_fin < un_mes_atras:
-                vendedor.estado = 'CANCELADA'
+            elif vendedor.estado == constants.ESTADO_VENDEDOR_MORA and ultima_suscripcion.fecha_fin < un_mes_atras:
+                vendedor.estado = constants.ESTADO_VENDEDOR_CANCELADO
                 vendedor.save()
                 actualizados_cancelada += 1
                 

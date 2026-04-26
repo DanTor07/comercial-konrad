@@ -1,4 +1,5 @@
 from django.db import transaction
+from ....core import constants
 
 from ...domain.entities.venta import Carrito, MetodoPago, Pedido
 from ...domain.ports.producto_repository import ProductoRepositoryPort
@@ -115,7 +116,7 @@ class CheckoutFacade:
         return {
             'success': True,
             'pedido_id': pedido_id,
-            'estado': 'PAGADO',
+            'estado': constants.PEDIDO_ESTADO_PAGADO,
             'total': total_pagar,
             'subtotal': subtotal,
             'comision': total_comision,
@@ -164,7 +165,7 @@ class CheckoutFacade:
             iva=iva,
             total=total,
             metodo_pago=metodo_pago.value,
-            estado="PAGADO"
+            estado=constants.PEDIDO_ESTADO_PAGADO
         )
         for item in cart.items:
             PedidoItemModel.objects.create(

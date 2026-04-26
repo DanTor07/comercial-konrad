@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from . import constants
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
@@ -13,14 +14,14 @@ class Categoria(models.Model):
 
 class SolicitudVendedor(models.Model):
     ESTADO_CHOICES = [
-        ('PENDIENTE', 'Pendiente'),
-        ('RECHAZADA', 'Rechazada'),
-        ('DEVUELTA', 'Devuelta'),
-        ('APROBADA', 'Aprobada'),
+        (constants.ESTADO_SOLICITUD_PENDIENTE, 'Pendiente'),
+        (constants.ESTADO_SOLICITUD_RECHAZADA, 'Rechazada'),
+        (constants.ESTADO_SOLICITUD_DEVUELTA, 'Devuelta'),
+        (constants.ESTADO_SOLICITUD_APROBADA, 'Aprobada'),
     ]
     TIPO_PERSONA_CHOICES = [
-        ('NATURAL', 'Persona Natural'),
-        ('JURIDICA', 'Persona Jurídica'),
+        (constants.TIPO_PERSONA_NATURAL, 'Persona Natural'),
+        (constants.TIPO_PERSONA_JURIDICA, 'Persona Jurídica'),
     ]
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
@@ -30,7 +31,7 @@ class SolicitudVendedor(models.Model):
     pais = models.CharField(max_length=100)
     ciudad = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
-    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='PENDIENTE')
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default=constants.ESTADO_SOLICITUD_PENDIENTE)
     comentarios_director = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     score_datacredito = models.CharField(max_length=20, blank=True, null=True)
@@ -47,13 +48,13 @@ class DocumentoAdjunto(models.Model) :
 
 class Vendedor(models.Model):
     ESTADO_CHOICES = [
-        ('ACTIVA', 'Activa'),
-        ('EN MORA', 'En Mora'),
-        ('CANCELADA', 'Cancelada'),
+        (constants.ESTADO_VENDEDOR_ACTIVO, 'Activa'),
+        (constants.ESTADO_VENDEDOR_MORA, 'En Mora'),
+        (constants.ESTADO_VENDEDOR_CANCELADO, 'Cancelada'),
     ]
     solicitud = models.OneToOneField(SolicitudVendedor, on_delete=models.PROTECT)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendedor_profile')
-    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='ACTIVA')
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default=constants.ESTADO_VENDEDOR_ACTIVO)
     calificacion_promedio = models.FloatField(default=0.0)
     numero_calificaciones_bajas = models.IntegerField(default=0)
 
@@ -78,9 +79,9 @@ class Comprador(models.Model):
 
 class Suscripcion(models.Model):
     TIPO_CHOICES = [
-        ('MENSUAL', 'Mensual'),
-        ('SEMESTRAL', 'Semestral'),
-        ('ANUAL', 'Anual'),
+        (constants.PLAN_MENSUAL, 'Mensual'),
+        (constants.PLAN_SEMESTRAL, 'Semestral'),
+        (constants.PLAN_ANUAL, 'Anual'),
     ]
     vendedor = models.ForeignKey(Vendedor, on_delete=models.CASCADE)
     fecha_inicio = models.DateTimeField()
@@ -143,7 +144,7 @@ class Pedido(models.Model):
     iva = models.FloatField(default=0.0)
     total = models.FloatField()
     metodo_pago = models.CharField(max_length=20)
-    estado = models.CharField(max_length=20, default='PENDIENTE')
+    estado = models.CharField(max_length=20, default=constants.PEDIDO_ESTADO_PENDIENTE)
 
     def __str__(self):
         return f"Pedido {self.id} - {self.comprador.username}"

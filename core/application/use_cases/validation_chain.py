@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from ...domain.ports.external_services import CreditScore
+from ....core import constants
 
 
 class ValidationResult:
@@ -67,14 +68,14 @@ class CreditScoreHandler(ValidationHandler):
         if score_dc == CreditScore.BAJA or score_cifin == CreditScore.BAJA:
             return ValidationResult(
                 False,
-                f"RECHAZADA: Score crediticio bajo. "
+                f"{constants.ESTADO_SOLICITUD_RECHAZADA}: Score crediticio bajo. "
                 f"Datacredito={score_dc.value}, CIFIN={score_cifin.value}."
             )
 
         if score_dc == CreditScore.ADVERTENCIA or score_cifin == CreditScore.ADVERTENCIA:
             return ValidationResult(
                 False,
-                f"DEVUELTA: Score en estado de advertencia. "
+                f"{constants.ESTADO_SOLICITUD_DEVUELTA}: Score en estado de advertencia. "
                 f"Datacredito={score_dc.value}, CIFIN={score_cifin.value}. "
                 f"Se requiere documentación adicional."
             )
@@ -105,7 +106,7 @@ class PoliceRecordHandler(ValidationHandler):
         if has_record:
             return ValidationResult(
                 False,
-                "RECHAZADA: El solicitante registra antecedentes judiciales."
+                f"{constants.ESTADO_SOLICITUD_RECHAZADA}: El solicitante registra antecedentes judiciales."
             )
 
         return self._pass_to_next(solicitud)
@@ -120,6 +121,6 @@ class ManualApprovalHandler(ValidationHandler):
     def handle(self, solicitud) -> ValidationResult:
         return ValidationResult(
             True,
-            "PENDIENTE: Verificaciones automáticas superadas. "
+            f"{constants.ESTADO_SOLICITUD_PENDIENTE}: Verificaciones automáticas superadas. "
             "En espera de aprobación del director comercial."
         )

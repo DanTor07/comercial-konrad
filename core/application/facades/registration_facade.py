@@ -3,6 +3,7 @@ from ...application.use_cases.validation_chain import (
     CreditScoreHandler, PoliceRecordHandler, ManualApprovalHandler, ValidationResult
 )
 from ...infrastructure.adapters.external_checks import DatacreditoAdapter, CifinAdapter, PoliceAdapter
+from ....core import constants
 
 
 class RegistrationFacade:
@@ -52,7 +53,7 @@ class RegistrationFacade:
         """
         # Paso 1: Guardar la solicitud principal
         solicitud = form.save(commit=False)
-        solicitud.estado = 'PENDIENTE'
+        solicitud.estado = constants.ESTADO_SOLICITUD_PENDIENTE
         solicitud.save()
 
         # Paso 2: Persistir documentos via Factory Method
@@ -64,15 +65,15 @@ class RegistrationFacade:
         # Paso 4: Actualizar estado según resultado de la cadena
         if not resultado.passed:
             # La cadena detectó un problema automático
-            if resultado.reason.startswith("RECHAZADA"):
-                solicitud.estado = 'RECHAZADA'
+            if resultado.reason.startswith(constants.ESTADO_SOLICITUD_RECHAZADA):
+                solicitud.estado = constants.ESTADO_SOLICITUD_RECHAZADA
                 solicitud.comentarios_director = resultado.reason
-            elif resultado.reason.startswith("DEVUELTA"):
-                solicitud.estado = 'DEVUELTA'
+            elif resultado.reason.startswith(constants.ESTADO_SOLICITUD_DEVUELTA):
+                solicitud.estado = constants.ESTADO_SOLICITUD_DEVUELTA
                 solicitud.comentarios_director = resultado.reason
         else:
             # Pasó todas las verificaciones automáticas → queda PENDIENTE
-            solicitud.estado = 'PENDIENTE'
+            solicitud.estado = constants.ESTADO_SOLICITUD_PENDIENTE
             solicitud.comentarios_director = resultado.reason
 
         solicitud.save(update_fields=['estado', 'comentarios_director'])

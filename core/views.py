@@ -14,6 +14,7 @@ import uuid
 import os
 import random
 import string
+from . import constants
 from .forms import SolicitudVendedorForm, ProductoForm, CompradorForm
 from .infrastructure.dependencies import (
     get_registrar_solicitud_use_case,
@@ -104,11 +105,11 @@ def iniciar_pago_suscripcion(request):
         
         request.session['suscripcion_plan'] = plan
         
-        if metodo == 'LINEA':
+        if metodo == constants.METODO_PAGO_LINEA:
             return redirect('pago_en_linea')
-        elif metodo == 'TARJETA':
+        elif metodo == constants.METODO_PAGO_TARJETA:
             return redirect('pago_tarjeta')
-        elif metodo == 'CONSIGNACION':
+        elif metodo == constants.METODO_PAGO_CONSIGNACION:
             return redirect('pago_consignacion')
             
     return redirect('vendedor_dashboard')
@@ -120,8 +121,12 @@ def pago_en_linea(request):
         precio = request.session.get('checkout_total')
         tipo = 'Compra de Productos'
     else:
-        plan = request.session.get('suscripcion_plan', 'MENSUAL')
-        precios = {'MENSUAL': 50000, 'SEMESTRAL': 250000, 'ANUAL': 450000}
+        plan = request.session.get('suscripcion_plan', constants.PLAN_MENSUAL)
+        precios = {
+            constants.PLAN_MENSUAL: 50000, 
+            constants.PLAN_SEMESTRAL: 250000, 
+            constants.PLAN_ANUAL: 450000
+        }
         precio = precios.get(plan, 0)
         tipo = f'Suscripción {plan}'
     
@@ -130,7 +135,7 @@ def pago_en_linea(request):
         if pedido_id:
             return _finalizar_pago_pedido(request, pedido_id, num_aprobacion)
         else:
-            plan = request.session.get('suscripcion_plan', 'MENSUAL')
+            plan = request.session.get('suscripcion_plan', constants.PLAN_MENSUAL)
             _activar_suscripcion(request.user.vendedor_profile, plan)
             messages.success(request, f'Pago aprobado. Nro de aprobación bancaria: {num_aprobacion}')
             return redirect('vendedor_dashboard')
@@ -144,16 +149,20 @@ def pago_tarjeta(request):
         precio = request.session.get('checkout_total')
         tipo = 'Compra de Productos'
     else:
-        plan = request.session.get('suscripcion_plan', 'MENSUAL')
-        precios = {'MENSUAL': 50000, 'SEMESTRAL': 250000, 'ANUAL': 450000}
+        plan = request.session.get('suscripcion_plan', constants.PLAN_MENSUAL)
+        precios = {
+            constants.PLAN_MENSUAL: 50000, 
+            constants.PLAN_SEMESTRAL: 250000, 
+            constants.PLAN_ANUAL: 450000
+        }
         precio = precios.get(plan, 0)
         tipo = f'Suscripción {plan}'
     
     if request.method == 'POST':
         if pedido_id:
-            return _finalizar_pago_pedido(request, pedido_id, "TARJETA")
+            return _finalizar_pago_pedido(request, pedido_id, constants.METODO_PAGO_TARJETA)
         else:
-            plan = request.session.get('suscripcion_plan', 'MENSUAL')
+            plan = request.session.get('suscripcion_plan', constants.PLAN_MENSUAL)
             _activar_suscripcion(request.user.vendedor_profile, plan)
             messages.success(request, 'Pago con Tarjeta de Crédito procesado exitosamente.')
             return redirect('vendedor_dashboard')
@@ -169,8 +178,12 @@ def pago_consignacion(request):
         identificacion = request.user.username
         nombre = f"{request.user.first_name} {request.user.last_name}"
     else:
-        plan = request.session.get('suscripcion_plan', 'MENSUAL')
-        precios = {'MENSUAL': 50000, 'SEMESTRAL': 250000, 'ANUAL': 450000}
+        plan = request.session.get('suscripcion_plan', constants.PLAN_MENSUAL)
+        precios = {
+            constants.PLAN_MENSUAL: 50000, 
+            constants.PLAN_SEMESTRAL: 250000, 
+            constants.PLAN_ANUAL: 450000
+        }
         precio = precios.get(plan, 0)
         tipo = f'Suscripción {plan}'
         vendedor = request.user.vendedor_profile
@@ -188,9 +201,9 @@ def pago_consignacion(request):
             cedula, estado = linea.split(',')
             if estado == 'PAGADO' and cedula == identificacion:
                 if pedido_id:
-                    return _finalizar_pago_pedido(request, pedido_id, "CONSIGNACION")
+                    return _finalizar_pago_pedido(request, pedido_id, constants.METODO_PAGO_CONSIGNACION)
                 else:
-                    plan = request.session.get('suscripcion_plan', 'MENSUAL')
+                    plan = request.session.get('suscripcion_plan', constants.PLAN_MENSUAL)
                     _activar_suscripcion(request.user.vendedor_profile, plan)
                     messages.success(request, 'Conciliación bancaria exitosa. Suscripción activada.')
                     return redirect('vendedor_dashboard')
@@ -199,7 +212,7 @@ def pago_consignacion(request):
 
 def _finalizar_pago_pedido(request, pedido_id, num_aprobacion):
     pedido = Pedido.objects.get(id=pedido_id)
-    pedido.estado = 'PAGADO'
+    pedido.estado = constants.PEDIDO_ESTADO_PAGADO
     pedido.save()
     
     for item in pedido.items.all():
@@ -216,9 +229,9 @@ def _finalizar_pago_pedido(request, pedido_id, num_aprobacion):
 
 def _activar_suscripcion(vendedor, plan):
     hoy = timezone.now()
-    if plan == 'MENSUAL':
+    if plan == constants.PLAN_MENSUAL:
         fin = hoy + timedelta(days=30)
-    elif plan == 'SEMESTRAL':
+    elif plan == constants.PLAN_SEMESTRAL:
         fin = hoy + timedelta(days=180)
     else:
         fin = hoy + timedelta(days=365)
@@ -230,7 +243,7 @@ def _activar_suscripcion(vendedor, plan):
         tipo_facturacion=plan,
         esta_activa=True
     )
-    vendedor.estado = 'ACTIVA'
+    vendedor.estado = constants.ESTADO_VENDEDOR_ACTIVO
     vendedor.save()
 
 
@@ -245,19 +258,19 @@ def registrar_vendedor(request):
             estado = resultado['estado']
             sol_id = resultado['solicitud_id']
 
-            if estado == 'PENDIENTE':
+            if estado == constants.ESTADO_SOLICITUD_PENDIENTE:
                 messages.success(
                     request,
                     f'✅ Solicitud #{sol_id} registrada. '
-                    f'Estado: PENDIENTE — En espera de aprobación del director.'
+                    f'Estado: {constants.ESTADO_SOLICITUD_PENDIENTE} — En espera de aprobación del director.'
                 )
-            elif estado == 'RECHAZADA':
+            elif estado == constants.ESTADO_SOLICITUD_RECHAZADA:
                 messages.error(
                     request,
                     f'❌ Solicitud #{sol_id} rechazada automáticamente. '
                     f'Motivo: {resultado["message"]}'
                 )
-            elif estado == 'DEVUELTA':
+            elif estado == constants.ESTADO_SOLICITUD_DEVUELTA:
                 messages.warning(
                     request,
                     f'⚠️ Solicitud #{sol_id} devuelta para revisión. '
@@ -755,14 +768,14 @@ def calificar_transaccion(request, pedido_id):
             # Recalcular promedio y contador de malas calificaciones
             todas = CalificacionTransaccion.objects.filter(vendedor=vendedor)
             promedio = todas.aggregate(Avg('puntaje'))['puntaje__avg'] or 0
-            bajas = todas.filter(puntaje__lt=3).count()
+            bajas = todas.filter(puntaje__lt=constants.UMBRAL_CALIFICACION_NEGATIVA).count()
             vendedor.calificacion_promedio = promedio
             vendedor.numero_calificaciones_bajas = bajas
             vendedor.save()
 
-            # Si el promedio baja de 5 o tiene 10 calificaciones < 3, se cancela
-            if (promedio < 5 and todas.count() >= 1) or bajas >= 10:
-                vendedor.estado = 'CANCELADA'
+            # Si el promedio baja del umbral o supera el máximo de bajas, se cancela
+            if (promedio < constants.CALIFICACION_MIN_PROMEDIO and todas.count() >= 1) or bajas >= constants.CALIFICACION_MAX_BAJAS:
+                vendedor.estado = constants.ESTADO_VENDEDOR_CANCELADO
                 vendedor.save()
                 # Notificar al vendedor
                 try:
