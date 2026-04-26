@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; color: #334155; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #f8fafc; padding-bottom: 40px; }
+        .main { background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; font-family: sans-serif; color: #334155; border-radius: 12px; overflow: hidden; margin-top: 40px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .header { background-color: #4f46e5; background-image: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 40px 20px; text-align: center; color: #ffffff; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.025em; }
+        .content { padding: 40px 30px; line-height: 1.6; }
+        .content h2 { margin-top: 0; color: #1e293b; font-size: 22px; font-weight: 700; }
+        .footer { padding: 30px; text-align: center; font-size: 13px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
+        .btn { display: inline-block; padding: 14px 28px; background-color: #4f46e5; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin-top: 25px; transition: background-color 0.3s; }
+        .highlight-box { background-color: #f1f5f9; border-radius: 8px; padding: 20px; margin: 25px 0; border: 1px solid #e2e8f0; }
+        .credential-item { margin: 8px 0; font-family: 'Courier New', Courier, monospace; font-size: 15px; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <table class="main">
+            <tr>
+                <td class="header">
+                    <h1>Comercial Konrad</h1>
+                </td>
+            </tr>
+            <tr>
+                <td class="content">
+                    {% block body %}{% endblock %}
+                </td>
+            </tr>
+            <tr>
+                <td class="footer">
+                    <p>Has recibido este correo porque te registraste en Comercial Konrad.</p>
+                    <p>&copy; 2026 Comercial Konrad | Av. Calle 100, Bogotá, Colombia</p>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

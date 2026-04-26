@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ producto.nombre }} - Comercial Konrad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #4F46E5; --primary-dark: #4338CA; --light: #F9FAFB; --dark: #1F2937; --gray: #6B7280; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; color: var(--dark); }
+        nav {
+            background: white; padding: 1rem 5%; display: flex; justify-content: space-between;
+            align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        nav a { text-decoration: none; color: var(--dark); padding: 8px 16px; border-radius: 8px; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .product-images .main-img { width: 100%; height: 360px; object-fit: cover; border-radius: 12px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; color: #9CA3AF; overflow: hidden; }
+        .product-images .main-img img { width: 100%; height: 100%; object-fit: cover; }
+        .thumbnail-row { display: flex; gap: 10px; margin-top: 12px; }
+        .thumbnail-row img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
+        .thumbnail-row img:hover { border-color: var(--primary); }
+        .product-info h1 { font-size: 1.8rem; margin: 0 0 8px 0; }
+        .category-badge { display: inline-block; background: #EEF2FF; color: var(--primary); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 16px; }
+        .price { font-size: 2rem; font-weight: 700; color: var(--primary); margin: 16px 0; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .meta-item { background: #F9FAFB; padding: 10px 14px; border-radius: 10px; }
+        .meta-item .label { font-size: 0.75rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.05em; }
+        .meta-item .value { font-weight: 600; margin-top: 2px; }
+        .btn-cart { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 16px; transition: background 0.2s; text-decoration: none; display: block; text-align: center; }
+        .btn-cart:hover { background: var(--primary-dark); }
+        .section { background: white; border-radius: 16px; padding: 30px; margin-top: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .section h2 { margin: 0 0 20px 0; font-size: 1.2rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 12px; }
+        .vendor-info { display: flex; align-items: center; gap: 16px; }
+        .vendor-avatar { width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; }
+        .star-rating { color: #FBBF24; font-size: 1.1rem; }
+        .comment-card { border: 1px solid #F3F4F6; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .comment-author { font-weight: 600; font-size: 0.9rem; }
+        .comment-date { color: var(--gray); font-size: 0.8rem; }
+        .comment-text { margin-top: 8px; color: #374151; }
+        .question-badge { background: #EEF2FF; color: var(--primary); font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: 8px; }
+        .answer-box { background: #F9FAFB; border-left: 3px solid var(--primary); padding: 10px 14px; margin-top: 10px; border-radius: 0 8px 8px 0; font-size: 0.9rem; color: #374151; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+        .form-group textarea, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #E5E7EB; border-radius: 8px; font-family: 'Outfit', sans-serif; resize: vertical; }
+        .btn-submit { padding: 10px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'inicio' %}" class="logo">Comercial Konrad</a>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a href="{% url 'catalog' %}">← Catálogo</a>
+            <a href="{% url 'view_cart' %}" style="background:var(--primary);color:white;border-radius:8px;padding:8px 16px;font-weight:600;">🛒 Carrito</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+        <div style="margin-bottom: 20px;">
+            {% for message in messages %}
+            <div style="padding: 12px; border-radius: 8px; margin-bottom: 8px;
+                 {% if message.tags == 'error' %}background:#FEE2E2;color:#991B1B;{% else %}background:#D1FAE5;color:#065F46;{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="product-detail">
+            <!-- Imágenes -->
+            <div class="product-images">
+                <div class="main-img" id="main-img-container">
+                    {% with producto.imagenes.first as primera_imagen %}
+                        {% if primera_imagen %}
+                            <img src="{{ primera_imagen.imagen.url }}" alt="{{ producto.nombre }}" id="main-img">
+                        {% else %}
+                            📦 Sin imagen disponible
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                {% if producto.imagenes.count > 1 %}
+                <div class="thumbnail-row">
+                    {% for img in producto.imagenes.all %}
+                    <img src="{{ img.imagen.url }}" alt="{{ producto.nombre }}" onclick="document.getElementById('main-img').src='{{ img.imagen.url }}'">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Info del producto -->
+            <div class="product-info">
+                <span class="category-badge">{{ producto.categoria.nombre }}</span>
+                <h1>{{ producto.nombre }}</h1>
+                <p style="color: var(--gray); margin: 0;">{{ producto.subcategoria }} · {{ producto.marca }}</p>
+
+                <div class="price">${{ producto.valor_unitario|floatformat:0 }} COP</div>
+
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <div class="label">Color</div>
+                        <div class="value">{{ producto.color }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="label">Talla</div>
+                        <div class="value">{{ producto.talla }}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="label">Tamaño</div>
+                        <div class="value">{{ producto.tamano }} cm</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="label">Peso</div>
+                        <div class="value">{{ producto.peso }} kg</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="label">Stock disponible</div>
+                        <div class="value">{{ producto.cantidad_disponible }} und.</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="label">Condición</div>
+                        <div class="value">{% if producto.es_nuevo %}✅ Nuevo{% else %}🔄 Usado{% endif %}</div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="label">Origen</div>
+                        <div class="value">{% if producto.es_original %}✅ Original{% else %}🔄 Réplica{% endif %}</div>
+                    </div>
+                </div>
+
+                <p style="color: #374151; line-height: 1.6;">{{ producto.caracteristicas }}</p>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'add_to_cart' producto.id %}" class="btn-cart">🛒 Agregar al Carrito</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn-cart" style="background: #374151;">Inicia sesión para comprar</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reputación del vendedor -->
+        <div class="section">
+            <h2>Vendedor</h2>
+            <div class="vendor-info">
+                <div class="vendor-avatar">{{ producto.vendedor.solicitud.nombres.0 }}</div>
+                <div>
+                    <div style="font-weight: 700; font-size: 1rem;">{{ producto.vendedor.solicitud.nombres }} {{ producto.vendedor.solicitud.apellidos }}</div>
+                    <div class="star-rating">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= producto.vendedor.calificacion_promedio %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                        <span style="color: var(--gray); font-size: 0.85rem;">({{ producto.vendedor.calificacion_promedio|floatformat:1 }}/10)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preguntas y Comentarios -->
+        <div class="section">
+            <h2>Preguntas y Comentarios</h2>
+
+            {% for comentario in producto.comentarios.all %}
+            <div class="comment-card">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div>
+                        <span class="comment-author">{{ comentario.comprador.nombres }}</span>
+                        {% if comentario.es_pregunta %}<span class="question-badge">Pregunta</span>{% endif %}
+                    </div>
+                    <span class="comment-date">{{ comentario.fecha|date:"d M Y" }}</span>
+                </div>
+                <p class="comment-text">{{ comentario.texto }}</p>
+                {% if comentario.respuesta_vendedor %}
+                <div class="answer-box">
+                    <strong>Respuesta del vendedor:</strong> {{ comentario.respuesta_vendedor }}
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="color: var(--gray);">Aún no hay comentarios ni preguntas sobre este producto.</p>
+            {% endfor %}
+
+            {% if user.is_authenticated %}
+            {% if user_es_comprador %}
+            <form method="POST" action="{% url 'agregar_comentario' producto.id %}" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #F3F4F6;">
+                {% csrf_token %}
+                <h3 style="margin:0 0 16px 0; font-size:1rem;">Deja tu pregunta o comentario</h3>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select name="es_pregunta">
+                        <option value="False">Comentario</option>
+                        <option value="True">Pregunta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mensaje</label>
+                    <textarea name="texto" rows="3" placeholder="Escribe aquí..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Enviar</button>
+            </form>
+            {% else %}
+            <p style="color: var(--gray); margin-top: 20px;">Solo los compradores registrados pueden hacer preguntas y comentarios.</p>
+            {% endif %}
+            {% else %}
+            <p style="color: var(--gray); margin-top: 20px;"><a href="{% url 'login' %}" style="color: var(--primary);">Inicia sesión</a> o <a href="{% url 'registrar_comprador' %}" style="color: var(--primary);">regístrate</a> para hacer preguntas.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

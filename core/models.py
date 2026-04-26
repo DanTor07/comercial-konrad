@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
-    porcentaje_comision = models.FloatField()
+    porcentaje_comision = models.FloatField(help_text="Porcentaje de comisión (ej. 0.1 para 10%)")
+    porcentaje_iva = models.FloatField(default=0.19, help_text="Porcentaje de IVA (ej. 0.19)")
+    domicilio_base = models.FloatField(default=10000, help_text="Costo base de domicilio para esta categoría")
     es_iva_incluido = models.BooleanField(default=True)
 
     def __str__(self):
@@ -58,6 +60,22 @@ class Vendedor(models.Model):
     def __str__(self):
         return self.solicitud.numero_identificacion
 
+class Comprador(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='comprador_profile')
+    nombres = models.CharField(max_length=100)
+    apellidos = models.CharField(max_length=100)
+    numero_identificacion = models.CharField(max_length=20, unique=True)
+    correo_electronico = models.EmailField()
+    pais = models.CharField(max_length=100)
+    ciudad = models.CharField(max_length=100)
+    direccion = models.CharField(max_length=200)
+    telefono = models.CharField(max_length=20)
+    twitter = models.CharField(max_length=100, blank=True, null=True)
+    instagram = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.nombres} {self.apellidos}"
+
 class Suscripcion(models.Model):
     TIPO_CHOICES = [
         ('MENSUAL', 'Mensual'),
@@ -93,6 +111,17 @@ class ProductoImagen(models.Model):
     producto = models.ForeignKey(Producto, related_name='imagenes', on_delete=models.CASCADE)
     imagen = models.ImageField(upload_to='productos/')
 
+class ComentarioProducto(models.Model):
+    producto = models.ForeignKey(Producto, related_name='comentarios', on_delete=models.CASCADE)
+    comprador = models.ForeignKey(Comprador, on_delete=models.CASCADE)
+    es_pregunta = models.BooleanField(default=False)
+    texto = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    respuesta_vendedor = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Comentario de {self.comprador.nombres} en {self.producto.nombre}"
+
 class Auditoria(models.Model):
     accion = models.CharField(max_length=100)
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -108,6 +137,10 @@ class LogError(models.Model):
 class Pedido(models.Model):
     comprador = models.ForeignKey(User, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now_add=True)
+    subtotal = models.FloatField(default=0.0)
+    comision = models.FloatField(default=0.0)
+    envio = models.FloatField(default=0.0)
+    iva = models.FloatField(default=0.0)
     total = models.FloatField()
     metodo_pago = models.CharField(max_length=20)
     estado = models.CharField(max_length=20, default='PENDIENTE')
@@ -120,6 +153,25 @@ class PedidoItem(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
     cantidad = models.IntegerField()
     precio_unitario = models.FloatField()
+
+class CalificacionTransaccion(models.Model):
+    pedido = models.OneToOneField(Pedido, related_name='calificacion', on_delete=models.CASCADE)
+    comprador = models.ForeignKey(Comprador, on_delete=models.CASCADE)
+    vendedor = models.ForeignKey(Vendedor, on_delete=models.CASCADE)
+    puntaje = models.IntegerField(choices=[(i, str(i)) for i in range(1, 11)]) # 1 to 10
+    comentario = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+class ConfiguracionSistema(models.Model):
+    # Singleton para configuraciones globales
+    porcentaje_iva = models.FloatField(default=0.19)
+    costo_domicilio_base = models.FloatField(default=10000.0)
+    costo_domicilio_por_kg = models.FloatField(default=1000.0)
+
+    @classmethod
+    def get_config(cls):
+        obj, created = cls.objects.get_or_create(id=1)
+        return obj
 
 
 class PQRS(models.Model):

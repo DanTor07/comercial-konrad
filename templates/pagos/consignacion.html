@@ -7,12 +7,12 @@
         
         <div style="border: 2px dashed #D1D5DB; padding: 20px; border-radius: 8px; margin-bottom: 30px; font-family: monospace;">
             <h3 style="text-align: center; margin-top: 0;">Banco Konrad - Recaudo Empresarial</h3>
-            <p><strong>Referencia de Pago (ID Vendedor):</strong> {{ vendedor.solicitud.numero_identificacion }}</p>
-            <p><strong>Nombre:</strong> {{ vendedor.solicitud.nombres }} {{ vendedor.solicitud.apellidos }}</p>
-            <p><strong>Concepto:</strong> Pago Suscripción {{ plan }}</p>
+            <p><strong>Referencia de Pago:</strong> {{ identificacion }}</p>
+            <p><strong>Nombre:</strong> {{ nombre }}</p>
+            <p><strong>Concepto:</strong> {{ tipo }}</p>
             <p><strong>Valor a Pagar:</strong> ${{ precio }} COP</p>
             <div style="text-align: center; margin-top: 20px;">
-                <img src="https://barcode.tec-it.com/barcode.ashx?data={{ vendedor.solicitud.numero_identificacion }}{{ precio }}&code=Code128&dpi=96" alt="Barcode" style="max-width: 100%;">
+                <img src="https://barcode.tec-it.com/barcode.ashx?data={{ identificacion }}{{ precio }}&code=Code128&dpi=96" alt="Barcode" style="max-width: 100%;">
             </div>
         </div>
         
@@ -20,7 +20,7 @@
             <button type="button" onclick="window.print()" style="padding: 10px 20px; background: #475569; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 10px;">
                 🖨️ Imprimir Recibo
             </button>
-            <a href="{% url 'vendedor_dashboard' %}" style="text-decoration: none; color: var(--primary); font-weight: bold;">Volver al Tablero</a>
+            <a href="javascript:history.back()" style="text-decoration: none; color: var(--primary); font-weight: bold;">Cancelar / Volver</a>
         </div>
 
         <hr style="border: none; border-top: 1px solid #E5E7EB; margin-bottom: 20px;">

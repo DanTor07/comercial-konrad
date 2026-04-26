@@ -1,7 +1,7 @@
-from datetime import datetime
-from django.db.models import Sum, Avg
-
-from ...models import Auditoria, LogError, Pedido as PedidoModel, Vendedor as VendedorModel
+from datetime import datetime, timedelta
+from django.db.models import Sum, Avg, Count, Max
+from django.utils import timezone
+from ...models import Auditoria, LogError, Pedido as PedidoModel, Vendedor as VendedorModel, PedidoItem, ComentarioProducto, Suscripcion
 
 
 class AuditService:
@@ -57,12 +57,52 @@ class BAMService:
 
     def get_kpis(self) -> dict:
         """Calcula y retorna los KPIs actuales del negocio."""
+        ahora = timezone.now()
+        hace_mes = ahora - timedelta(days=30)
+        hace_semana = ahora - timedelta(days=7)
+
         ventas = PedidoModel.objects.filter(estado="PAGADO")
+        
+        # Producto con mayor venta en el último mes
+        top_producto = PedidoItem.objects.filter(
+            pedido__estado="PAGADO", 
+            pedido__fecha__gte=hace_mes
+        ).values('producto__nombre').annotate(
+            total_vendido=Sum('cantidad')
+        ).order_by('-total_vendido').first()
+
+        # Categoría con mayores consultas en la última semana
+        top_categoria_consultas = ComentarioProducto.objects.filter(
+            fecha__gte=hace_semana,
+            es_pregunta=True
+        ).values('producto__categoria__nombre').annotate(
+            total_consultas=Count('id')
+        ).order_by('-total_consultas').first()
+
+        suscripciones = Suscripcion.objects.all()
+        suscripciones_semestres = []
+        
+        for i in range(4):
+            target_date = ahora - timedelta(days=180 * i)
+            is_s1 = target_date.month <= 6
+            semestre_label = f"{target_date.year}-{'S1' if is_s1 else 'S2'}"
+            
+            count = Suscripcion.objects.filter(
+                fecha_inicio__year=target_date.year,
+                fecha_inicio__month__lte=6 if is_s1 else 12,
+                fecha_inicio__month__gte=1 if is_s1 else 7
+            ).count()
+            
+            suscripciones_semestres.append({'label': semestre_label, 'count': count})
+
         return {
             "ventas_totales": ventas.aggregate(Sum('total'))['total__sum'] or 0,
             "cantidad_pedidos": ventas.count(),
             "vendedores_activos": VendedorModel.objects.count(),
             "ticket_promedio": ventas.aggregate(Avg('total'))['total__avg'] or 0,
+            "top_producto": top_producto,
+            "top_categoria": top_categoria_consultas,
+            "suscripciones_semestres": reversed(suscripciones_semestres)
         }
 
     def invalidar_cache(self):

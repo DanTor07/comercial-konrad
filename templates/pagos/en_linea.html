@@ -3,7 +3,7 @@
 <div style="display: flex; justify-content: center; align-items: center; min-height: 80vh; background-color: var(--light);">
     <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 500px;">
         <h2 style="color: var(--primary); margin: 0 0 10px 0; text-align: center;">Pagos en Línea (PSE)</h2>
-        <p style="text-align: center; color: #6B7280; margin-bottom: 30px;">Plan: {{ plan }} | Valor a pagar: ${{ precio }}</p>
+        <p style="text-align: center; color: #6B7280; margin-bottom: 30px;">Concepto: {{ tipo }} | Valor a pagar: ${{ precio }}</p>
         
         <form method="POST">
             {% csrf_token %}
@@ -34,7 +34,7 @@
             <button type="submit" style="width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
                 Ir al Banco y Pagar
             </button>
-            <a href="{% url 'vendedor_dashboard' %}" style="display: block; text-align: center; margin-top: 15px; color: var(--error); text-decoration: none;">Cancelar</a>
+            <a href="javascript:history.back()" style="display: block; text-align: center; margin-top: 15px; color: var(--error); text-decoration: none;">Cancelar</a>
         </form>
     </div>
 </div>

@@ -1,0 +1,20 @@
+{% extends 'emails/base_email.html' %}
+{% block body %}
+    <h2>¡Bienvenido, {{ nombres }}!</h2>
+    <p>Estamos muy felices de tenerte con nosotros. Tu cuenta como <strong>Comprador</strong> en Comercial Konrad ha sido creada exitosamente.</p>
+    
+    <p>A partir de ahora, podrás explorar miles de productos, agregarlos a tu carrito y realizar compras de forma segura con los mejores vendedores de la región.</p>
+    
+    <div class="highlight-box">
+        <p style="margin-top: 0; font-weight: 600; color: #4f46e5;">Tus credenciales de acceso:</p>
+        <div class="credential-item">Usuario: <strong>{{ username }}</strong></div>
+        <div class="credential-item">Contraseña: <strong>{{ password }}</strong></div>
+        <p style="margin-bottom: 0; font-size: 13px; color: #64748b; margin-top: 15px;">Nota: Por seguridad, te recomendamos cambiar tu contraseña una vez ingreses a la plataforma.</p>
+    </div>
+    
+    <div style="text-align: center;">
+        <a href="http://127.0.0.1:8000/login/" class="btn">Empezar a Comprar</a>
+    </div>
+    
+    <p style="margin-top: 30px; font-size: 14px;">Si tienes alguna pregunta o necesitas ayuda para empezar, no dudes en contactar a nuestro equipo de soporte.</p>
+{% endblock %}

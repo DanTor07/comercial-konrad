@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 600px; margin: 40px auto;">
+    <h2 style="color: var(--primary); text-align: center; margin-bottom: 20px;">Registro de Comprador</h2>
+    <p style="text-align: center; color: #6B7280; margin-bottom: 30px;">Crea tu cuenta para empezar a comprar.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            {% for field in form %}
+                <div class="form-group" {% if field.name == 'direccion' or field.name == 'correo_electronico' %}style="grid-column: 1 / -1;"{% endif %}>
+                    <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--dark);">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div style="color: red; font-size: 0.85rem; margin-top: 5px;">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" style="width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 20px;">Registrarse</button>
+    </form>
+</div>
+{% endblock %}

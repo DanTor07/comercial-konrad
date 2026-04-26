@@ -23,8 +23,9 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Dashboard del Director</h1>
+    <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="margin:0;">Dashboard del Director</h1>
+        <a href="{% url 'bam_dashboard' %}" style="background: #4F46E5; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-family: 'Outfit', sans-serif;">📊 Tablero de Control (BAM)</a>
     </div>
     <div class="main">
         {% if messages %}

@@ -82,7 +82,7 @@ nav ul li a:hover {
     left: 0;
     right: 0;
     text-align: center;
-    color: white;
+    color: #333; /* Texto oscuro por defecto */
     z-index: 1;
     display: flex;
     justify-content: center;
@@ -91,6 +91,33 @@ nav ul li a:hover {
     background: rgba(0, 0, 0, 0.7);
     padding: 20px;
     margin: 0; /* Asegurar que no hay márgenes */
+}
+
+.overlay-content h1, .overlay-content h2, .overlay-content p {
+    color: white; /* Titulos y parrafos directos en blanco para legibilidad en overlay */
+}
+
+/* Forzar color oscuro en elementos de formulario y tarjetas */
+.overlay-content form, 
+.overlay-content form label, 
+.overlay-content form p,
+.overlay-content form span,
+.overlay-content .card, 
+.overlay-content .card h2, 
+.overlay-content .card p,
+.overlay-content .register-form,
+.overlay-content .register-form h2,
+.overlay-content .register-form h3,
+.overlay-content .register-form p,
+.overlay-content .register-form label,
+.overlay-content .pqrs-form,
+.overlay-content .pqrs-form label,
+.overlay-content .pqrs-form p,
+.overlay-content div[style*="background: white"],
+.overlay-content div[style*="background: white"] h2,
+.overlay-content div[style*="background: white"] p,
+.overlay-content div[style*="background: white"] label {
+    color: #333 !important;
 }
 
 /* Estilos para los campos del formulario */

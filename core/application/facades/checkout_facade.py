@@ -3,7 +3,12 @@ from django.db import transaction
 from ...domain.entities.venta import Carrito, MetodoPago, Pedido
 from ...domain.ports.producto_repository import ProductoRepositoryPort
 from ...infrastructure.adapters.payment_strategies import PaymentContext
-from ...models import Pedido as PedidoModel, PedidoItem as PedidoItemModel
+from ...models import (
+    Pedido as PedidoModel, 
+    PedidoItem as PedidoItemModel, 
+    ConfiguracionSistema, 
+    Producto as ProductoModel
+)
 
 
 class CheckoutFacade:
@@ -18,7 +23,7 @@ class CheckoutFacade:
 
     Internamente coordina:
       1. Validación de stock disponible
-      2. Cálculo de subtotal, IVA (19%) y total
+      2. Cálculo de subtotal, IVA y total
       3. Procesamiento de pago via PaymentContext (Strategy)
       4. Persistencia atómica del Pedido en BD
       5. Actualización de stock por ítem
@@ -35,15 +40,15 @@ class CheckoutFacade:
         self._producto_repo = producto_repo
         self._notification_service = notification_service
 
-    def procesar(self, cart: Carrito, metodo_pago: MetodoPago, comprador_id: int) -> dict:
+    def procesar(self, cart: Carrito, metodo_pago: MetodoPago, comprador_id: int, con_domicilio: bool = False) -> dict:
         """
         Punto de entrada único del checkout.
-
-        Returns:
-            dict con claves: 'success', 'pedido_id', 'estado', 'total', 'message'
+        Calcula totales y procesa el pago.
         """
         if not cart.items:
             return {'success': False, 'message': 'El carrito está vacío.'}
+
+        config = ConfiguracionSistema.get_config()
 
         # Paso 1: Validar stock
         error_stock = self._validar_stock(cart)
@@ -51,17 +56,46 @@ class CheckoutFacade:
             return {'success': False, 'message': error_stock}
 
         # Paso 2: Calcular totales
-        subtotal = sum(item.cantidad * item.precio_unitario for item in cart.items)
-        iva = round(subtotal * 0.19, 2)
-        total = round(subtotal + iva, 2)
+        subtotal = 0
+        total_comision = 0
+        total_iva = 0
+        peso_total = 0
+        bases_domicilio = []
 
-        # Paso 3: Construir Pedido dominio y procesar pago (Strategy)
+        for item in cart.items:
+            prod_model = ProductoModel.objects.get(id=item.producto_id)
+            sub_item = item.cantidad * item.precio_unitario
+            subtotal += sub_item
+            
+            # 1. Comisión por categoría
+            total_comision += sub_item * (prod_model.categoria.porcentaje_comision / 100)
+            
+            # 2. Peso para domicilio
+            peso_total += prod_model.peso * item.cantidad
+            bases_domicilio.append(prod_model.categoria.domicilio_base)
+            
+            # 3. IVA configurable por categoría
+            if not prod_model.categoria.es_iva_incluido:
+                total_iva += sub_item * prod_model.categoria.porcentaje_iva
+
+        # Costo extra por domicilio (Ciudad y Peso)
+        total_envio = 0
+        if con_domicilio:
+            base_domicilio = max(bases_domicilio) if bases_domicilio else 0
+            total_envio = base_domicilio + (peso_total * config.costo_domicilio_por_kg)
+
+        total_pagar = subtotal + total_comision + total_iva + total_envio
+
+        # Paso 3: Procesar pago (Strategy)
+        # Reutilizamos el objeto Pedido dominio temporal para la estrategia
         pedido_dominio = Pedido(
             id=None,
             comprador_id=comprador_id,
             items=cart.items,
-            total=total,
-            estado="PROCESANDO",
+            total_comision=total_comision,
+            total_envio=total_envio,
+            total_impuestos=total_iva,
+            total_pagar=total_pagar,
             metodo_pago=metodo_pago
         )
 
@@ -70,28 +104,23 @@ class CheckoutFacade:
         if not pago_exitoso:
             return {'success': False, 'message': 'El pago no pudo ser procesado. Intente nuevamente.'}
 
-        # Paso 4: Persistir Pedido en BD de forma atómica (Transactional Client)
-        pedido_id = self._persistir_pedido(cart, comprador_id, total, metodo_pago)
+        # Paso 4: Persistir Pedido en BD (Transactional Client)
+        pedido_id = self._persistir_pedido(
+            cart, comprador_id, subtotal, total_comision, total_envio, total_iva, total_pagar, metodo_pago
+        )
 
         # Paso 5: Actualizar stock
         self._actualizar_stock(cart)
-
-        # Paso 6: Notificar
-        if self._notification_service:
-            self._notification_service.notify("PEDIDO_PAGADO", {
-                "pedido_id": pedido_id,
-                "total": total,
-                "subtotal": subtotal,
-                "iva": iva,
-            })
 
         return {
             'success': True,
             'pedido_id': pedido_id,
             'estado': 'PAGADO',
-            'total': total,
+            'total': total_pagar,
             'subtotal': subtotal,
-            'iva': iva,
+            'comision': total_comision,
+            'iva': total_iva,
+            'envio': total_envio,
             'message': f'Pago procesado correctamente. Pedido #{pedido_id}.'
         }
 
@@ -100,7 +129,6 @@ class CheckoutFacade:
     def _validar_stock(self, cart: Carrito) -> str:
         """
         Verifica que haya suficiente stock para cada ítem.
-        Retorna un mensaje de error o cadena vacía si todo está bien.
         """
         for item in cart.items:
             producto = self._producto_repo.get_by_id(item.producto_id)
@@ -118,15 +146,22 @@ class CheckoutFacade:
         self,
         cart: Carrito,
         comprador_id: int,
+        subtotal: float,
+        comision: float,
+        envio: float,
+        iva: float,
         total: float,
         metodo_pago: MetodoPago
     ) -> int:
         """
-        Transactional Client: crea el Pedido y todos sus PedidoItems
-        en una sola transacción atómica. Si algo falla, se hace rollback completo.
+        Transactional Client: crea el Pedido y todos sus PedidoItems.
         """
         pedido_model = PedidoModel.objects.create(
             comprador_id=comprador_id,
+            subtotal=subtotal,
+            comision=comision,
+            envio=envio,
+            iva=iva,
             total=total,
             metodo_pago=metodo_pago.value,
             estado="PAGADO"

@@ -88,6 +88,15 @@
         </div>
     </nav>
     <section class="hero">
+        {% if messages %}
+        <div style="max-width: 800px; margin: 0 auto 30px auto;">
+            {% for message in messages %}
+            <div style="padding: 14px 20px; border-radius: 8px; margin-bottom: 12px; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); text-align: left;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <h1>Transforma tu Negocio</h1>
         <p>La plataforma líder en E-Commerce para la comunidad Konrad Lorenz.</p>
         <div>

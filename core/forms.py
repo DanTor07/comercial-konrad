@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
-from .models import SolicitudVendedor, Producto, Categoria
+from .models import SolicitudVendedor, Producto, Categoria, Comprador
 
 class SolicitudVendedorForm(forms.ModelForm):
     pdf_validator = FileExtensionValidator(allowed_extensions=['pdf'])
@@ -123,4 +123,21 @@ class CategoriaForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'porcentaje_comision': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+class CompradorForm(forms.ModelForm):
+    class Meta:
+        model = Comprador
+        fields = ['nombres', 'apellidos', 'numero_identificacion', 'correo_electronico', 'pais', 'ciudad', 'direccion', 'telefono', 'twitter', 'instagram']
+        widgets = {
+            'nombres': forms.TextInput(attrs={'class': 'form-control'}),
+            'apellidos': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_identificacion': forms.TextInput(attrs={'class': 'form-control'}),
+            'correo_electronico': forms.EmailInput(attrs={'class': 'form-control'}),
+            'pais': forms.TextInput(attrs={'class': 'form-control'}),
+            'ciudad': forms.TextInput(attrs={'class': 'form-control'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'twitter': forms.TextInput(attrs={'class': 'form-control'}),
+            'instagram': forms.TextInput(attrs={'class': 'form-control'}),
         }

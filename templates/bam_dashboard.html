@@ -153,25 +153,61 @@
     <div class="grid">
         <div class="card">
             <h3>Ventas Consolidadas</h3>
-            <div class="value">${{ kpis.ventas_totales }}</div>
-            <div style="color: #10b981;">↑ 12% Rendimiento</div>
+            <div class="value">${{ kpis.ventas_totales|floatformat:0 }}</div>
+            <div style="color: #10b981; font-weight: 600;">📊 Total Histórico</div>
         </div>
         <div class="card">
-            <h3>Transacciones (Sim.)</h3>
-            <div class="value">{{ kpis.cantidad_pedidos }}</div>
-            <div style="color: #94a3b8;">Tiempo real</div>
+            <h3>Producto Estrella (Mes)</h3>
+            <div class="value" style="font-size: 1.5rem; height: 60px; display: flex; align-items: center;">
+                {% if kpis.top_producto %}
+                    {{ kpis.top_producto.producto__nombre }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div style="color: var(--accent); font-weight: 600;">🏆 {{ kpis.top_producto.total_vendido|default:0 }} Vendidos</div>
         </div>
         <div class="card">
-            <h3>Vendedores</h3>
-            <div class="value">{{ kpis.vendedores_activos }}</div>
-            <div style="color: #6366f1;">Escalabilidad OK</div>
+            <h3>Categoría en Tendencia</h3>
+            <div class="value" style="font-size: 1.5rem; height: 60px; display: flex; align-items: center;">
+                {% if kpis.top_categoria %}
+                    {{ kpis.top_categoria.producto__categoria__nombre }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div style="color: #60a5fa; font-weight: 600;">💬 {{ kpis.top_categoria.total_consultas|default:0 }} Consultas (Semana)</div>
         </div>
     </div>
 
-    <div class="simulation-grid">
-        <div class="sim-tag active">● REST API: ONLINE</div>
-        <div class="sim-tag active">● CIFIN FLAT-FILE: READY</div>
-        <div class="sim-tag active">● PASARELA: SIMULATED</div>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 24px;">
+        <!-- Gráfico de Semestres (Simulado con barras CSS) -->
+        <div class="card">
+            <h3 style="margin-bottom: 25px;">Crecimiento de Suscripciones por Semestre</h3>
+            <div style="display: flex; align-items: flex-end; justify-content: space-around; height: 200px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                {% for sem in kpis.suscripciones_semestres %}
+                <div style="display: flex; flex-direction: column; align-items: center; width: 60px;">
+                    <div style="background: linear-gradient(to top, var(--primary), var(--secondary)); width: 100%; border-radius: 8px 8px 0 0; transition: height 1s ease; height: {% widthratio sem.count 10 100 %}px; min-height: 5px; position: relative;" title="{{ sem.count }} suscripciones">
+                        <span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 700;">{{ sem.count }}</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.7rem; color: #94a3b8; font-weight: 600;">{{ sem.label }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Estado del Ecosistema</h3>
+            <div style="margin-top: 20px;">
+                <div class="sim-tag active" style="margin-bottom: 10px; justify-content: flex-start;">● API: PROCESANDO VIRTUAL</div>
+                <div class="sim-tag active" style="margin-bottom: 10px; justify-content: flex-start; border-color: #f59e0b; color: #f59e0b;">● BANCOS: CONCILIANDO</div>
+                <div class="sim-tag" style="justify-content: flex-start; opacity: 0.5;">● LOGS: AUDITANDO</div>
+            </div>
+            <div style="margin-top: 20px; font-size: 0.85rem; color: #94a3b8;">
+                Vendedores Activos: <strong>{{ kpis.vendedores_activos }}</strong><br>
+                Ticket Promedio: <strong>${{ kpis.ticket_promedio|floatformat:0 }}</strong>
+            </div>
+        </div>
     </div>
 
     <div class="table-container">

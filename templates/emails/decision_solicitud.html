@@ -1,71 +1,42 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #1f2937; }
-        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .header { background-color: #4F46E5; padding: 30px; text-align: center; color: #ffffff; }
-        .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
-        .content { padding: 40px 30px; line-height: 1.6; }
-        .content h2 { margin-top: 0; color: #111827; font-size: 20px; }
-        .status-box { padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid; }
-        .status-APROBADA { background-color: #ecfdf5; border-color: #10b981; }
-        .status-RECHAZADA { background-color: #fef2f2; border-color: #ef4444; }
-        .status-DEVUELTA { background-color: #fffbeb; border-color: #f59e0b; }
-        .status-title { font-weight: 700; margin-bottom: 5px; }
-        .status-APROBADA .status-title { color: #065f46; }
-        .status-RECHAZADA .status-title { color: #991b1b; }
-        .status-DEVUELTA .status-title { color: #92400e; }
-        .credentials { background-color: #f9fafb; border: 1px dashed #d1d5db; padding: 15px; border-radius: 6px; margin-top: 20px; }
-        .credentials p { margin: 5px 0; font-family: monospace; font-size: 14px; }
-        .footer { background-color: #f9fafb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb; }
-        .button { display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: #ffffff !important; text-decoration: none; border-radius: 6px; font-weight: 600; margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Comercial Konrad</h1>
+{% extends 'emails/base_email.html' %}
+{% block body %}
+    <h2>Hola, {{ solicitud.nombres }}</h2>
+    <p>Te escribimos para notificarte el resultado de tu solicitud de registro como vendedor en Comercial Konrad.</p>
+    
+    {% if decision == 'APROBADA' %}
+        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <strong style="font-size: 18px;">✅ ¡Solicitud Aprobada!</strong>
         </div>
-        <div class="content">
-            <h2>Hola, {{ solicitud.nombres }}</h2>
-            <p>Te escribimos para notificarte una actualización importante respecto a tu solicitud de registro como vendedor en nuestra plataforma.</p>
-            
-            <div class="status-box status-{{ decision }}">
-                <div class="status-title">Estado de la Solicitud: {{ decision }}</div>
-                {% if comentarios %}
-                <div style="margin-top: 10px;">
-                    <strong>Comentarios del Director Comercial:</strong><br>
-                    {{ comentarios|linebreaksbr }}
-                </div>
-                {% endif %}
-            </div>
+        <p>¡Felicidades! Has superado nuestras validaciones y ahora formas parte de nuestra red oficial de vendedores. Ya puedes empezar a publicar tus productos y gestionar tus ventas.</p>
+        
+        <div class="highlight-box">
+            <p style="margin-top: 0; font-weight: 600; color: #4f46e5;">Tus credenciales de acceso:</p>
+            <div class="credential-item">Usuario: <strong>{{ username }}</strong></div>
+            <div class="credential-item">Contraseña: <strong>{{ password }}</strong></div>
+            <p style="margin-bottom: 0; font-size: 13px; color: #64748b; margin-top: 15px;">Recuerda que para empezar a vender debes activar tu suscripción en el panel de control.</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="http://127.0.0.1:8000/login/" class="btn">Ir a mi Panel de Vendedor</a>
+        </div>
 
-            {% if decision == 'APROBADA' %}
-            <p>¡Felicidades! Has superado todas nuestras validaciones y nos complace darte la bienvenida a nuestra comunidad. A partir de este momento puedes comenzar a publicar y vender tus productos.</p>
-            
-            <div class="credentials">
-                <strong>Tus credenciales de acceso iniciales:</strong>
-                <p>Usuario: <strong>{{ username }}</strong></p>
-                <p>Contraseña: <strong>{{ password }}</strong></p>
-                <small style="color: #6b7280;">Te recomendamos cambiar esta contraseña la primera vez que ingreses.</small>
-            </div>
-            
-            <div style="text-align: center;">
-                <a href="#" class="button">Ir a mi Panel de Control</a>
-            </div>
-            {% elif decision == 'DEVUELTA' %}
-            <p>Tu solicitud requiere revisión. Por favor, lee atentamente los comentarios del director comercial y ponte en contacto con nuestro equipo de soporte para adjuntar la documentación o corregir la información requerida.</p>
-            {% elif decision == 'RECHAZADA' %}
-            <p>Lamentamos informarte que en esta ocasión no podemos aprobar tu ingreso a la plataforma de Comercial Konrad. Agradecemos mucho tu interés y el tiempo invertido.</p>
-            {% endif %}
-            
+    {% elif decision == 'DEVUELTA' %}
+        <div style="background-color: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <strong style="font-size: 18px;">⚠️ Solicitud en Revisión</strong>
         </div>
-        <div class="footer">
-            <p>Este es un correo automático. Por favor no respondas a esta dirección.</p>
-            <p>&copy; 2026 Comercial Konrad. Todos los derechos reservados.</p>
+        <p>Tu solicitud requiere ajustes antes de ser aprobada. Por favor, revisa los comentarios a continuación:</p>
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; font-style: italic; border-left: 4px solid #f59e0b;">
+            "{{ comentarios }}"
         </div>
-    </div>
-</body>
-</html>
+        <p style="margin-top: 20px;">Por favor, contacta a soporte para actualizar la información requerida.</p>
+
+    {% else %}
+        <div style="background-color: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <strong style="font-size: 18px;">❌ Solicitud Rechazada</strong>
+        </div>
+        <p>Lamentamos informarte que tu solicitud no ha sido aprobada en esta ocasión.</p>
+        {% if comentarios %}
+            <p>Motivo: <em>{{ comentarios }}</em></p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

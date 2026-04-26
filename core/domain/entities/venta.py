@@ -41,7 +41,6 @@ class Carrito:
 class Pedido:
     id: Optional[int]
     comprador_id: int
-    fecha: datetime
     items: List[CarritoItem]
     total_comision: float
     total_envio: float
