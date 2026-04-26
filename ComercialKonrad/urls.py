@@ -45,11 +45,6 @@ urlpatterns = [
     path('director/suscripcion/<int:vendedor_id>/', gestionar_suscripcion, name='gestionar_suscripcion'),
     path('catalog/producto/<int:producto_id>/', detalle_producto, name='detalle_producto'),
     path('catalog/producto/<int:producto_id>/comentar/', agregar_comentario, name='agregar_comentario'),
-    # PQRS
-    path('pqrs/', listar_pqrs, name='listar_pqrs'),
-    path('pqrs/nueva/', crear_pqrs, name='crear_pqrs'),
-    path('pqrs/<int:pqrs_id>/', detalle_pqrs, name='detalle_pqrs'),
-    path('pqrs/gestion/', gestion_pqrs, name='gestion_pqrs'),
     # API REST (Externa)
     path('api/ventas/', get_simulated_sales, name='api_ventas'),
     path('api/vendedores/', get_simulated_sellers, name='api_vendedores'),

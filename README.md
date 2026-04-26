@@ -59,12 +59,11 @@ La aplicación queda disponible en la dirección: `http://127.0.0.1:8000/`.
 El sistema integra diversos patrones de diseño para garantizar la escalabilidad y el desacoplamiento:
 
 *   **Facade:** Utilizado en `RegistrationFacade` y `CheckoutFacade` para simplificar procesos complejos, ofreciendo una interfaz única a las vistas.
-*   **Factory Method:** Implementado en `PQRSFactory` para la creación dinámica de solicitudes y en la validación de perfiles de vendedores.
+*   **Factory Method:** Implementado en la validación de perfiles de vendedores para instanciar diversos validadores según el tipo de persona.
 *   **Strategy:** Aplicado en el procesamiento de pagos, permitiendo alternar dinámicamente entre PSE, Tarjeta de Crédito y Consignación Bancaria.
 *   **Singleton:** Empleado en el `BAMService` para garantizar una única instancia del monitor de KPIs y en la configuración global del sistema.
 *   **Observer:** Utilizado para notificar automáticamente a diversos servicios (Email, Auditoría) cuando ocurren cambios en el estado de las suscripciones.
-*   **Proxy:** Implementado para interceptar y auditar la creación de productos sin modificar la lógica principal.
-*   **Routing Slip:** Aplicado en el módulo de PQRS para mantener una traza secuencial e inmutable de los estados por los que transita una solicitud.
+*   **Proxy:** Implementado para interceptar y auditar la creación de productos, asegurando que solo vendedores con suscripción activa puedan publicar.
 *   **Transactional Client:** Asegura la atomicidad en la persistencia de pedidos complejos y sus ítems relacionados.
 
 ---
