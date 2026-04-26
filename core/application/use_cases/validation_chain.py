@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from ...domain.ports.external_services import CreditScore
-from ....core import constants
+from core import constants
 
 
 class ValidationResult:

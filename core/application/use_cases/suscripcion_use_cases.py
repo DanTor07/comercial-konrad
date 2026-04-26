@@ -5,7 +5,7 @@ from ...domain.services.notifications import (
     SuscripcionBlockerObserver,
 )
 from ...models import Suscripcion as SuscripcionModel, Vendedor as VendedorModel
-from ....core import constants
+from core import constants
 
 
 class GestionarSuscripcionUseCase:

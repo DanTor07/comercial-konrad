@@ -1,5 +1,5 @@
 from django.db import transaction
-from ....core import constants
+from core import constants
 
 from ...domain.entities.venta import Carrito, MetodoPago, Pedido
 from ...domain.ports.producto_repository import ProductoRepositoryPort

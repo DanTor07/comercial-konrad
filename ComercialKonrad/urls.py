@@ -7,7 +7,6 @@ from core.views import (
     view_cart, create_product,
     checkout, bam_dashboard,
     gestionar_suscripcion, custom_login, custom_logout, vendedor_dashboard,
-    crear_pqrs, listar_pqrs, detalle_pqrs, gestion_pqrs,
     iniciar_pago_suscripcion, pago_en_linea, pago_tarjeta, pago_consignacion,
     consultar_estado, registrar_comprador, detalle_producto,
     agregar_comentario, calificar_transaccion,

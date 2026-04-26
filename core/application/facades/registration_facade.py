@@ -3,7 +3,7 @@ from ...application.use_cases.validation_chain import (
     CreditScoreHandler, PoliceRecordHandler, ManualApprovalHandler, ValidationResult
 )
 from ...infrastructure.adapters.external_checks import DatacreditoAdapter, CifinAdapter, PoliceAdapter
-from ....core import constants
+from core import constants
 
 
 class RegistrationFacade:
