@@ -4,15 +4,17 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 from django.utils import timezone
+from django.utils.html import strip_tags
+from django.template.loader import render_to_string
 from datetime import timedelta
 import uuid
 import os
 import random
 import string
-from .forms import SolicitudVendedorForm, ProductoForm
+from .forms import SolicitudVendedorForm, ProductoForm, CompradorForm
 from .infrastructure.dependencies import (
     get_registrar_solicitud_use_case,
     get_procesar_decision_use_case,
@@ -39,7 +41,8 @@ from .models import (
     Suscripcion, Producto as ProductoModel,
     Comprador, ComentarioProducto, Pedido, PedidoItem,
     CalificacionTransaccion, ConfiguracionSistema,
-    Vendedor as VendedorModel
+    Vendedor as VendedorModel, Categoria as CategoriaModel,
+    ProductoImagen
 )
 
 def home(request):
@@ -198,7 +201,6 @@ def pago_consignacion(request):
     return render(request, 'pagos/consignacion.html', {'tipo': tipo, 'precio': precio, 'identificacion': identificacion, 'nombre': nombre})
 
 def _finalizar_pago_pedido(request, pedido_id, num_aprobacion):
-    from .models import Pedido, PedidoItem, Producto
     pedido = Pedido.objects.get(id=pedido_id)
     pedido.estado = 'PAGADO'
     pedido.save()
@@ -332,10 +334,9 @@ def procesar_solicitud(request, solicitud_id):
     return redirect('dashboard_director')
 
 def catalog(request):
-    from core.models import Categoria as CategoriaModel
     categorias = CategoriaModel.objects.all()
     
-    # Punto 8: Filtros
+    # Filtros de búsqueda
     query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria', '')
     subcategoria = request.GET.get('subcategoria', '')
@@ -502,7 +503,6 @@ def create_product(request):
                 # Guardar imagenes adjuntas
                 imagenes = request.FILES.getlist('imagenes_producto')
                 for img in imagenes:
-                    from core.models import ProductoImagen
                     ProductoImagen.objects.create(producto_id=producto_guardado.id, imagen=img)
 
                 messages.success(request, 'Producto publicado exitosamente.')
@@ -541,9 +541,8 @@ def checkout(request):
         ]
         cart = Carrito(comprador_id=comprador_id, items=carrito_items)
         
-        # 2. Usar Facade para validación y persistencia inicial
+        # Usar Facade para validación y persistencia inicial
         try:
-            from .models import ConfiguracionSistema, Producto as ProductoModel
             config = ConfiguracionSistema.get_config()
             subtotal = 0
             total_comision = 0
@@ -708,14 +707,6 @@ def gestion_pqrs(request):
     })
 
 def registrar_comprador(request):
-    from core.forms import CompradorForm
-    from django.contrib.auth.models import User
-    from django.core.mail import EmailMultiAlternatives
-    from django.template.loader import render_to_string
-    from django.utils.html import strip_tags
-    import string
-    import random
-    
     if request.method == 'POST':
         form = CompradorForm(request.POST)
         if form.is_valid():
