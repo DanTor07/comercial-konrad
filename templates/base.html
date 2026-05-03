@@ -5,33 +5,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Comercial Konrad{% endblock %}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/base/styles.css' %}">
-    {% block extra_css %}
-        <link rel="stylesheet" type="text/css" href="{% static 'css/registrar/form_principal.css' %}">
-        <link rel="stylesheet" href="{% static 'css/pqrs/pqrs.css' %}">
-    {% endblock %}
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base/styles.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header>
-        <h1>Comercial Konrad</h1>
-    </header>
+    {% block nav %}
+    <nav class="navbar">
+        <a href="{% url 'inicio' %}" class="logo">Comercial Konrad</a>
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <a href="{% url 'catalog' %}">Catálogo</a>
+                {% if user.is_staff or user.is_superuser %}
+                    <a href="{% url 'dashboard_director' %}">Panel Director</a>
+                {% endif %}
+                {% if user.vendedor_profile %}
+                    <a href="{% url 'vendedor_dashboard' %}">Mi Portal</a>
+                {% endif %}
+                <a href="{% url 'view_cart' %}" class="cart-badge">🛒 Carrito</a>
+                <a href="{% url 'logout' %}" class="nav-danger">Cerrar Sesión</a>
+            {% else %}
+                <a href="{% url 'catalog' %}">Catálogo</a>
+                <a href="{% url 'registrar_vendedor' %}">Vender</a>
+                <a href="{% url 'registrar_comprador' %}">Registrarse</a>
+                <a href="{% url 'login' %}" class="btn-nav-primary">Iniciar Sesión</a>
+            {% endif %}
+        </div>
+    </nav>
+    {% endblock %}
 
-    <!-- Carrusel de fotos -->
-    <div class="carousel">
-        <div class="carousel-item active" style="background-image: url('https://www.uao.edu.co/wp-content/uploads/2021/05/SLIDE.jpg');"></div>
-        <div class="carousel-item" style="background-image: url('https://media.licdn.com/dms/image/v2/D4D12AQEUz1c-ZdwRTg/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1705085380090?e=2147483647&v=beta&t=S0aDuZoGBgGBBSc-qS94Cf3C6ksD0dzldYwbe3NkvZE');"></div>
-        <div class="carousel-item" style="background-image: url('https://media.licdn.com/dms/image/v2/D4D12AQEdVW-9wYShrg/article-cover_image-shrink_600_2000/article-cover_image-shrink_600_2000/0/1714050173696?e=2147483647&v=beta&t=Tjb1YrSkIJJWPz7qruQmC2Fm9UOxzKsRZx0LWcQUWAo');"></div>
-    </div>
-
-    <!-- Contenido centrado sobre el carrusel -->
-    <div class="overlay-content">
+    <main>
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
-    <footer>
-        <p>&copy; 2025 Comercial Konrad. Todos los derechos reservados. </p>
+    {% block footer %}
+    <footer class="footer">
+        <p>&copy; 2025 Comercial Konrad. Todos los derechos reservados.</p>
     </footer>
+    {% endblock %}
+
     <script src="{% static 'js/scripts.js' %}"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

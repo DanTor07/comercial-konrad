@@ -1,93 +1,66 @@
-{% load static %}
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Restablecer Contraseña</title>
-    <link rel="stylesheet" href="{% static 'css/contrasena/restablecer_contrasena.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-    <div class="form-container">
-        <h2>Restablecer Contraseña</h2>
-        <form method="POST">
-              <!-- Mostrar errores del formulario -->
+{% block title %}Restablecer Contraseña - Comercial Konrad{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.password-wrapper { position: relative; }
+.password-wrapper input { padding-right: 42px; }
+.toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--gray); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="center-page">
+    <div class="form-card" style="max-width: 460px;">
+        <h2 style="margin: 0 0 24px 0; color: var(--primary);">Restablecer Contraseña</h2>
+
+        {% if error %}<div class="msg msg-error" style="margin-bottom: 16px;">{{ error }}</div>{% endif %}
+        {% if success %}<div class="msg msg-success" style="margin-bottom: 16px;">{{ success }}</div>{% endif %}
+
         {% if form.errors %}
-            <ul class="errorlist">
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
+        <div class="msg msg-error" style="margin-bottom: 16px;">
+            <ul style="margin:0; padding-left:16px;">
+                {% for field in form %}{% for error in field.errors %}<li>{{ error }}</li>{% endfor %}{% endfor %}
+                {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
             </ul>
+        </div>
         {% endif %}
+
+        <form method="POST">
             {% csrf_token %}
-
-            <label>Nueva contraseña:</label>
-            <div class="password-wrapper">
-                <input type="password" name="nueva_contrasena" id="id_contrasena" required>
-                <span class="toggle-password" id="toggle-password" onclick="togglePassword()">
-                    <i id="password-icon" class="fas fa-eye"></i>
-                </span>
+            <div class="form-group">
+                <label>Nueva contraseña</label>
+                <div class="password-wrapper">
+                    <input type="password" name="nueva_contrasena" id="id_contrasena" required>
+                    <span class="toggle-password" onclick="togglePassword('id_contrasena', 'password-icon')"><i id="password-icon" class="fas fa-eye"></i></span>
+                </div>
             </div>
-
-            <label>Confirmar contraseña:</label>
-            <div class="password-wrapper">
-                <input type="password" name="confirmar_contrasena" id="id_confirmar_contrasena" required>
-                <span class="toggle-password" id="toggle-password-confirm" onclick="togglePasswordConfirm()">
-                    <i id="password-icon-confirm" class="fas fa-eye"></i>
-                </span>
+            <div class="form-group">
+                <label>Confirmar contraseña</label>
+                <div class="password-wrapper">
+                    <input type="password" name="confirmar_contrasena" id="id_confirmar_contrasena" required>
+                    <span class="toggle-password" onclick="togglePassword('id_confirmar_contrasena', 'password-icon-confirm')"><i id="password-icon-confirm" class="fas fa-eye"></i></span>
+                </div>
             </div>
-
-            <button type="submit">Restablecer</button>
+            <button type="submit" class="btn btn-primary btn-full" style="padding: 13px; margin-top: 8px;">Restablecer</button>
         </form>
 
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-        {% if success %}
-            <p class="success">{{ success }}</p>
-        {% endif %}
-
-        <a href="{% url 'iniciar_sesion' %}" class="btn-volver">Volver al inicio</a>
+        <a href="{% url 'login' %}" style="display:block; text-align:center; margin-top:20px; color:var(--gray); text-decoration:none; font-weight:500;">← Volver al inicio de sesión</a>
     </div>
+</div>
+{% endblock %}
 
-    <script>
-        function togglePassword() {
-            var passwordField = document.getElementById('id_contrasena');
-            var passwordIcon = document.getElementById('password-icon');
-
-            // Cambia el tipo del campo de password
-            if (passwordField.type === "password") {
-                passwordField.type = "text";  // Mostrar la contraseña
-                passwordIcon.classList.remove('fa-eye');  // Cambiar el icono
-                passwordIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = "password";  // Ocultar la contraseña
-                passwordIcon.classList.remove('fa-eye-slash');  // Cambiar el icono
-                passwordIcon.classList.add('fa-eye');
-            }
-        }
-
-        function togglePasswordConfirm() {
-            var passwordField = document.getElementById('id_confirmar_contrasena');
-            var passwordIcon = document.getElementById('password-icon-confirm');
-
-            // Cambia el tipo del campo de password
-            if (passwordField.type === "password") {
-                passwordField.type = "text";  // Mostrar la contraseña
-                passwordIcon.classList.remove('fa-eye');  // Cambiar el icono
-                passwordIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = "password";  // Ocultar la contraseña
-                passwordIcon.classList.remove('fa-eye-slash');  // Cambiar el icono
-                passwordIcon.classList.add('fa-eye');
-            }
-        }
-    </script>
-</body>
-</html>
+{% block extra_js %}
+<script>
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    icon.classList.toggle('fa-eye', !show);
+    icon.classList.toggle('fa-eye-slash', show);
+}
+</script>
+{% endblock %}

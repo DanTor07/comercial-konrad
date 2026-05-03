@@ -1,31 +1,26 @@
-{% load static %}
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Recuperar Contraseña</title>
-    <link rel="stylesheet" href="{% static 'css/contrasena/recuperar_contrasena.css' %}">
-</head>
-<body>
-    <div class="form-container">
-        <h2>Recuperar Contraseña</h2>
+{% block title %}Recuperar Contraseña - Comercial Konrad{% endblock %}
+
+{% block content %}
+<div class="center-page">
+    <div class="form-card" style="max-width: 460px;">
+        <h2 style="margin: 0 0 8px 0; color: var(--primary);">Recuperar Contraseña</h2>
+        <p style="color: var(--gray); margin-bottom: 24px;">Te enviaremos un enlace de recuperación a tu correo.</p>
+
+        {% if success %}<div class="msg msg-success" style="margin-bottom: 16px;">{{ success }}</div>{% endif %}
+        {% if error %}<div class="msg msg-error" style="margin-bottom: 16px;">{{ error }}</div>{% endif %}
+
         <form method="POST">
             {% csrf_token %}
-            <label for="correo">Ingresa tu correo electrónico:</label>
-            <input type="email" name="correo" id="correo" required>
-            <button type="submit">Enviar enlace de recuperación</button>
+            <div class="form-group">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" name="correo" id="correo" required placeholder="tu@correo.com">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" style="padding: 13px; margin-top: 8px;">Enviar enlace de recuperación</button>
         </form>
 
-        {% if success %}
-            <div class="alert alert-success">{{ success }}</div>
-        {% endif %}
-
-        {% if error %}
-            <div class="alert alert-danger">{{ error }}</div>
-        {% endif %}
-
-        <a href="{% url 'iniciar_sesion' %}" class="btn-volver">Volver al inicio</a>
+        <a href="{% url 'login' %}" style="display:block; text-align:center; margin-top:20px; color:var(--gray); text-decoration:none; font-weight:500;">← Volver al inicio de sesión</a>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

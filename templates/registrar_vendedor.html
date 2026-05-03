@@ -1,396 +1,173 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 {% load static %}
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Vendedor | Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --bg: #f8fafc;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
+{% block title %}Registro de Vendedor | Comercial Konrad{% endblock %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 40px 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 850px;
-            margin: 0 auto;
-        }
-
-        .registration-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 50px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            margin: 0 0 10px 0;
-            text-align: center;
-            background: linear-gradient(to right, var(--primary), #a855f7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            margin-bottom: 40px;
-            font-size: 1rem;
-        }
-
-        .form-section {
-            margin-bottom: 35px;
-            padding-bottom: 25px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .form-section:last-of-type {
-            border-bottom: none;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title span {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            font-size: 0.8rem;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-            color: #475569;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            background: #fff;
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-        }
-
-        input[type="file"] {
-            padding: 8px;
-            background: #f8fafc;
-        }
-
-        input[type="file"]::file-selector-button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            margin-right: 15px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        .formats-box {
-            background: #eef2ff;
-            border: 1px solid #c7d2fe;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .formats-text {
-            font-size: 0.9rem;
-            color: #3730a3;
-        }
-
-        .formats-links {
-            display: flex;
-            gap: 15px;
-        }
-
-        .format-btn {
-            padding: 8px 16px;
-            background: #fff;
-            color: var(--primary);
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.8rem;
-            border: 1px solid #c7d2fe;
-            transition: all 0.2s;
-        }
-
-        .format-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(to right, var(--primary), #4338ca);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 20px;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.3);
-        }
-
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 25px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover {
-            color: var(--primary);
-        }
-
-        .error-msg {
-            color: #ef4444;
-            font-size: 0.8rem;
-            margin-top: 6px;
-        }
-
-        @media (max-width: 640px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .registration-card {
-                padding: 30px 20px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <div class="registration-card">
-            <h1>Únete como Vendedor</h1>
-            <p class="subtitle">Comienza a escalar tu negocio con Comercial Konrad</p>
-            
-            <div style="text-align: center; margin-bottom: 20px;">
-                <p style="color: var(--text-muted); margin: 0; font-size: 0.95rem;">¿Ya enviaste tu solicitud? <a href="{% url 'consultar_estado' %}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Consulta su estado aquí</a></p>
-            </div>
-
-
-            <div class="formats-box">
-                <div class="formats-text">
-                    <strong>¿Aún no tienes los formatos?</strong><br>
-                    Descárgalos ahora mismo para completar tu registro.
-                </div>
-                <div class="formats-links">
-                    <a href="{% static 'documents/formato_centrales.pdf' %}" class="format-btn" download>Riesgo Central</a>
-                    <a href="{% static 'documents/formato_datos.pdf' %}" class="format-btn" download>Tratamiento Datos</a>
-                </div>
-            </div>
-
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-
-                <!-- Sección 1: Datos Personales -->
-                <div class="form-section">
-                    <div class="section-title"><span>1</span> Información Personal</div>
-                    <div class="grid">
-                        <div class="form-group">
-                            <label>Nombres</label>
-                            {{ form.nombres }}
-                            {% if form.nombres.errors %}
-                            <div class="error-msg">{{ form.nombres.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label>Apellidos</label>
-                            {{ form.apellidos }}
-                            {% if form.apellidos.errors %}
-                            <div class="error-msg">{{ form.apellidos.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label>Correo Electrónico</label>
-                            {{ form.correo_electronico }}
-                            {% if form.correo_electronico.errors %}
-                            <div class="error-msg">{{ form.correo_electronico.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label>Teléfono</label>
-                            {{ form.telefono }}
-                            {% if form.telefono.errors %}
-                            <div class="error-msg">{{ form.telefono.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sección 2: Ubicación y Tipo -->
-                <div class="form-section">
-                    <div class="section-title"><span>2</span> Perfil de Negocio</div>
-                    <div class="grid">
-                        <div class="form-group">
-                            <label>Tipo de Persona</label>
-                            {{ form.tipo_persona }}
-                        </div>
-                        <div class="form-group">
-                            <label>Identificación (Cédula o NIT)</label>
-                            {{ form.numero_identificacion }}
-                            {% if form.numero_identificacion.errors %}
-                            <div class="error-msg">{{ form.numero_identificacion.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label>País</label>
-                            {{ form.pais }}
-                        </div>
-                        <div class="form-group">
-                            <label>Ciudad</label>
-                            {{ form.ciudad }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sección 3: Documentación -->
-                <div class="form-section">
-                    <div class="section-title"><span>3</span> Documentos Adjuntos</div>
-                    <div class="grid">
-                        <div class="form-group">
-                            <label>Fotocopia Cédula (PDF)</label>
-                            {{ form.fotocopia_cedula }}
-                        </div>
-                        <div class="form-group">
-                            <label>RUT Actualizado</label>
-                            {{ form.rut }}
-                            <small style="color: var(--text-muted); font-size: 0.75rem;">Formato PDF obligatorio</small>
-                        </div>
-                        <div class="form-group" id="row_camara_comercio">
-                            <label>Cámara de Comercio</label>
-                            {{ form.camara_comercio }}
-                            <small id="camara_help" style="color: var(--text-muted); font-size: 0.75rem;">Requerido para Personas Jurídicas (PDF)</small>
-                            {% if form.camara_comercio.errors %}
-                            <div class="error-msg">{{ form.camara_comercio.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <label>Formato Centrales</label>
-                            {{ form.aceptacion_centrales }}
-                        </div>
-                        <div class="form-group">
-                            <label>Tratamiento de Datos</label>
-                            {{ form.aceptacion_datos }}
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit">Registrarme Ahora</button>
-            </form>
-
-            <a href="{% url 'inicio' %}" class="back-link">← Volver al inicio</a>
-        </div>
+{% block nav %}
+<nav class="navbar">
+    <a href="{% url 'inicio' %}" class="logo">Comercial Konrad</a>
+    <div class="nav-links">
+        <a href="{% url 'login' %}" class="btn-nav-primary">Iniciar Sesión</a>
     </div>
+</nav>
+{% endblock %}
 
-    <script>
-        const tipoPersonaSelect = document.getElementById('id_tipo_persona');
-        const camaraComercioInput = document.getElementById('id_camara_comercio');
-        const camaraComercioRow = document.getElementById('row_camara_comercio');
-        const camaraHelp = document.getElementById('camara_help');
+{% block content %}
+<div class="center-page" style="padding: 40px 20px;">
+    <div class="form-card" style="max-width: 850px;">
+        <h1 style="text-align:center; font-size:2rem; font-weight:800; margin:0 0 10px 0;
+            background: linear-gradient(to right, var(--primary), #a855f7);
+            -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
+            Únete como Vendedor
+        </h1>
+        <p style="text-align:center; color:var(--gray); margin-bottom: 20px;">Comienza a escalar tu negocio con Comercial Konrad</p>
 
-        function toggleJuridicaFields() {
-            if (tipoPersonaSelect && tipoPersonaSelect.value === 'JURIDICA') {
-                if (camaraComercioRow) {
-                    camaraComercioRow.style.opacity = '1';
-                    camaraComercioRow.style.pointerEvents = 'auto';
-                    camaraComercioRow.style.filter = 'none';
-                }
-                if (camaraComercioInput) camaraComercioInput.required = true;
-                if (camaraHelp) camaraHelp.style.color = 'var(--primary)';
-            } else {
-                if (camaraComercioRow) {
-                    camaraComercioRow.style.opacity = '0.4';
-                    camaraComercioRow.style.pointerEvents = 'none';
-                    camaraComercioRow.style.filter = 'grayscale(0.8)';
-                }
-                if (camaraComercioInput) {
-                    camaraComercioInput.required = false;
-                    camaraComercioInput.value = ''; // Clear selection if switching back
-                }
-                if (camaraHelp) camaraHelp.style.color = 'var(--text-muted)';
-            }
-        }
+        <div style="text-align: center; margin-bottom: 24px;">
+            <p style="color:var(--gray); margin:0; font-size:0.95rem;">¿Ya enviaste tu solicitud?
+                <a href="{% url 'consultar_estado' %}" style="color:var(--primary); font-weight:600; text-decoration:none;">Consulta su estado aquí</a>
+            </p>
+        </div>
 
-        if (tipoPersonaSelect) {
-            tipoPersonaSelect.addEventListener('change', toggleJuridicaFields);
-        }
-        window.addEventListener('DOMContentLoaded', toggleJuridicaFields);
-    </script>
-</body>
+        <div class="formats-box">
+            <div>
+                <strong>¿Aún no tienes los formatos?</strong><br>
+                <span style="font-size:0.9rem; color: var(--primary);">Descárgalos ahora mismo para completar tu registro.</span>
+            </div>
+            <div style="display:flex; gap:15px;">
+                <a href="{% static 'documents/formato_centrales.pdf' %}" class="btn btn-outline" style="font-size:0.85rem; padding:8px 16px;" download>Riesgo Central</a>
+                <a href="{% static 'documents/formato_datos.pdf' %}" class="btn btn-outline" style="font-size:0.85rem; padding:8px 16px;" download>Tratamiento Datos</a>
+            </div>
+        </div>
 
-</html>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Sección 1: Datos Personales -->
+            <div class="form-section">
+                <div class="section-title"><span>1</span> Información Personal</div>
+                <div class="reg-grid">
+                    <div class="form-group">
+                        <label>Nombres</label>{{ form.nombres }}
+                        {% if form.nombres.errors %}<div class="field-error">{{ form.nombres.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Apellidos</label>{{ form.apellidos }}
+                        {% if form.apellidos.errors %}<div class="field-error">{{ form.apellidos.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>{{ form.correo_electronico }}
+                        {% if form.correo_electronico.errors %}<div class="field-error">{{ form.correo_electronico.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>{{ form.telefono }}
+                        {% if form.telefono.errors %}<div class="field-error">{{ form.telefono.errors.0 }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 2: Perfil de Negocio -->
+            <div class="form-section">
+                <div class="section-title"><span>2</span> Perfil de Negocio</div>
+                <div class="reg-grid">
+                    <div class="form-group">
+                        <label>Tipo de Persona</label>{{ form.tipo_persona }}
+                    </div>
+                    <div class="form-group">
+                        <label>Identificación (Cédula o NIT)</label>{{ form.numero_identificacion }}
+                        {% if form.numero_identificacion.errors %}<div class="field-error">{{ form.numero_identificacion.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>País</label>{{ form.pais }}
+                    </div>
+                    <div class="form-group">
+                        <label>Ciudad</label>{{ form.ciudad }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección 3: Documentación -->
+            <div class="form-section">
+                <div class="section-title"><span>3</span> Documentos Adjuntos</div>
+                <div class="reg-grid">
+                    <div class="form-group">
+                        <label>Fotocopia Cédula (PDF)</label>{{ form.fotocopia_cedula }}
+                    </div>
+                    <div class="form-group">
+                        <label>RUT Actualizado</label>{{ form.rut }}
+                        <small style="color:var(--gray); font-size:0.75rem;">Formato PDF obligatorio</small>
+                    </div>
+                    <div class="form-group" id="row_camara_comercio">
+                        <label>Cámara de Comercio</label>{{ form.camara_comercio }}
+                        <small id="camara_help" style="color:var(--gray); font-size:0.75rem;">Requerido para Personas Jurídicas (PDF)</small>
+                        {% if form.camara_comercio.errors %}<div class="field-error">{{ form.camara_comercio.errors.0 }}</div>{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Formato Centrales</label>{{ form.aceptacion_centrales }}
+                    </div>
+                    <div class="form-group">
+                        <label>Tratamiento de Datos</label>{{ form.aceptacion_datos }}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" style="padding:16px; font-size:1.1rem; border-radius:12px; margin-top:20px;">Registrarme Ahora</button>
+        </form>
+
+        <a href="{% url 'inicio' %}" style="display:block; text-align:center; margin-top:25px; color:var(--gray); text-decoration:none; font-weight:500;">← Volver al inicio</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.formats-box {
+    background: #EEF2FF;
+    border: 1px solid #C7D2FE;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+.form-section { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+.form-section:last-of-type { border-bottom: none; }
+.section-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+.section-title span {
+    display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; background: var(--primary); color: white;
+    border-radius: 50%; font-size: 0.8rem;
+}
+.reg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.field-error { color: var(--error); font-size: 0.8rem; margin-top: 6px; }
+@media (max-width: 640px) { .reg-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const tipoPersonaSelect = document.getElementById('id_tipo_persona');
+const camaraComercioInput = document.getElementById('id_camara_comercio');
+const camaraComercioRow = document.getElementById('row_camara_comercio');
+const camaraHelp = document.getElementById('camara_help');
+
+function toggleJuridicaFields() {
+    if (!tipoPersonaSelect) return;
+    const isJuridica = tipoPersonaSelect.value === 'JURIDICA';
+    if (camaraComercioRow) {
+        camaraComercioRow.style.opacity = isJuridica ? '1' : '0.4';
+        camaraComercioRow.style.pointerEvents = isJuridica ? 'auto' : 'none';
+        camaraComercioRow.style.filter = isJuridica ? 'none' : 'grayscale(0.8)';
+    }
+    if (camaraComercioInput) {
+        camaraComercioInput.required = isJuridica;
+        if (!isJuridica) camaraComercioInput.value = '';
+    }
+    if (camaraHelp) camaraHelp.style.color = isJuridica ? 'var(--primary)' : 'var(--gray)';
+}
+
+if (tipoPersonaSelect) tipoPersonaSelect.addEventListener('change', toggleJuridicaFields);
+window.addEventListener('DOMContentLoaded', toggleJuridicaFields);
+</script>
+{% endblock %}

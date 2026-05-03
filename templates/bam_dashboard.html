@@ -1,193 +1,54 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends 'base.html' %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>BAM Dashboard | Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6366f1;
-            --secondary: #a855f7;
-            --accent: #ec4899;
-            --bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-        }
+{% block title %}BAM Dashboard | Comercial Konrad{% endblock %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
-            color: #f8fafc;
-            margin: 0;
-            padding: 40px;
-            min-height: 100vh;
-        }
+{% block nav %}
+<nav class="navbar" style="background: rgba(30,41,59,0.95); border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <span class="logo" style="color: #818cf8;">Control Tower BAM</span>
+    <div class="nav-links">
+        <a href="{% url 'dashboard_director' %}" style="color: #94a3b8;">← Panel Director</a>
+        <a href="{% url 'logout' %}" style="color: #f87171;">Cerrar Sesión</a>
+    </div>
+</nav>
+{% endblock %}
 
-        .header {
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin: 0;
-            background: linear-gradient(to right, #818cf8, #d946ef);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 24px;
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-        }
-
-        .card h3 {
-            color: #94a3b8;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin: 0;
-        }
-
-        .card .value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin: 15px 0;
-            color: #fff;
-        }
-
-        .simulation-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 40px;
-        }
-
-        .sim-tag {
-            padding: 10px;
-            border-radius: 12px;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sim-tag.active {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                opacity: 0.6;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.6;
-            }
-        }
-
-        .table-container {
-            margin-top: 40px;
-            background: var(--card-bg);
-            border-radius: 24px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            text-align: left;
-            color: #94a3b8;
-            font-size: 0.8rem;
-            padding-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 15px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            background: var(--primary);
-        }
-    </style>
-</head>
-
-<body>
-    <div class="header">
+{% block content %}
+<div class="bam-body">
+    <div class="bam-header">
         <h1>Control Tower BAM</h1>
-        <p style="color: #94a3b8;">Monitorización de Actividad Comercial - Konrad S.A.</p>
+        <p>Monitorización de Actividad Comercial - Konrad S.A.</p>
     </div>
 
-    <div class="grid">
-        <div class="card">
+    <div class="bam-grid">
+        <div class="bam-card">
             <h3>Ventas Consolidadas</h3>
-            <div class="value">${{ kpis.ventas_totales|floatformat:0 }}</div>
+            <div class="bam-value">${{ kpis.ventas_totales|floatformat:0 }}</div>
             <div style="color: #10b981; font-weight: 600;">📊 Total Histórico</div>
         </div>
-        <div class="card">
+        <div class="bam-card">
             <h3>Producto Estrella (Mes)</h3>
-            <div class="value" style="font-size: 1.5rem; height: 60px; display: flex; align-items: center;">
-                {% if kpis.top_producto %}
-                    {{ kpis.top_producto.producto__nombre }}
-                {% else %}
-                    N/A
-                {% endif %}
+            <div class="bam-value" style="font-size: 1.5rem; height: 60px; display: flex; align-items: center;">
+                {% if kpis.top_producto %}{{ kpis.top_producto.producto__nombre }}{% else %}N/A{% endif %}
             </div>
-            <div style="color: var(--accent); font-weight: 600;">🏆 {{ kpis.top_producto.total_vendido|default:0 }} Vendidos</div>
+            <div style="color: #ec4899; font-weight: 600;">🏆 {{ kpis.top_producto.total_vendido|default:0 }} Vendidos</div>
         </div>
-        <div class="card">
+        <div class="bam-card">
             <h3>Categoría en Tendencia</h3>
-            <div class="value" style="font-size: 1.5rem; height: 60px; display: flex; align-items: center;">
-                {% if kpis.top_categoria %}
-                    {{ kpis.top_categoria.producto__categoria__nombre }}
-                {% else %}
-                    N/A
-                {% endif %}
+            <div class="bam-value" style="font-size: 1.5rem; height: 60px; display: flex; align-items: center;">
+                {% if kpis.top_categoria %}{{ kpis.top_categoria.producto__categoria__nombre }}{% else %}N/A{% endif %}
             </div>
             <div style="color: #60a5fa; font-weight: 600;">💬 {{ kpis.top_categoria.total_consultas|default:0 }} Consultas (Semana)</div>
         </div>
     </div>
 
     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 24px;">
-        <!-- Gráfico de Semestres (Simulado con barras CSS) -->
-        <div class="card">
+        <!-- Gráfico de Semestres -->
+        <div class="bam-card">
             <h3 style="margin-bottom: 25px;">Crecimiento de Suscripciones por Semestre</h3>
             <div style="display: flex; align-items: flex-end; justify-content: space-around; height: 200px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
                 {% for sem in kpis.suscripciones_semestres %}
                 <div style="display: flex; flex-direction: column; align-items: center; width: 60px;">
-                    <div style="background: linear-gradient(to top, var(--primary), var(--secondary)); width: 100%; border-radius: 8px 8px 0 0; transition: height 1s ease; height: {% widthratio sem.count 10 100 %}px; min-height: 5px; position: relative;" title="{{ sem.count }} suscripciones">
+                    <div style="background: linear-gradient(to top, #6366f1, #a855f7); width: 100%; border-radius: 8px 8px 0 0; height: {% widthratio sem.count 10 100 %}px; min-height: 5px; position: relative;" title="{{ sem.count }} suscripciones">
                         <span style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 0.8rem; font-weight: 700;">{{ sem.count }}</span>
                     </div>
                     <div style="margin-top: 10px; font-size: 0.7rem; color: #94a3b8; font-weight: 600;">{{ sem.label }}</div>
@@ -196,43 +57,78 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="bam-card">
             <h3>Estado del Ecosistema</h3>
             <div style="margin-top: 20px;">
-                <div class="sim-tag active" style="margin-bottom: 10px; justify-content: flex-start;">● API: PROCESANDO VIRTUAL</div>
-                <div class="sim-tag active" style="margin-bottom: 10px; justify-content: flex-start; border-color: #f59e0b; color: #f59e0b;">● BANCOS: CONCILIANDO</div>
-                <div class="sim-tag" style="justify-content: flex-start; opacity: 0.5;">● LOGS: AUDITANDO</div>
+                <div class="sim-tag active" style="margin-bottom: 10px;">● API: PROCESANDO VIRTUAL</div>
+                <div class="sim-tag active" style="margin-bottom: 10px; border-color: #f59e0b; color: #f59e0b;">● BANCOS: CONCILIANDO</div>
+                <div class="sim-tag" style="opacity: 0.5;">● LOGS: AUDITANDO</div>
             </div>
             <div style="margin-top: 20px; font-size: 0.85rem; color: #94a3b8;">
-                Vendedores Activos: <strong>{{ kpis.vendedores_activos }}</strong><br>
-                Ticket Promedio: <strong>${{ kpis.ticket_promedio|floatformat:0 }}</strong>
+                Vendedores Activos: <strong style="color:white;">{{ kpis.vendedores_activos }}</strong><br>
+                Ticket Promedio: <strong style="color:white;">${{ kpis.ticket_promedio|floatformat:0 }}</strong>
             </div>
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="bam-card" style="margin-top: 24px;">
         <h3 style="margin-top: 0;">Registro de Auditoría</h3>
-        <table>
+        <table style="background: transparent; box-shadow: none;">
             <thead>
                 <tr>
-                    <th>Fecha/Hora</th>
-                    <th>Acción</th>
-                    <th>ID Usuario</th>
-                    <th>Detalles Operación</th>
+                    <th style="background: transparent; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.05);">Fecha/Hora</th>
+                    <th style="background: transparent; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.05);">Acción</th>
+                    <th style="background: transparent; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.05);">ID Usuario</th>
+                    <th style="background: transparent; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.05);">Detalles Operación</th>
                 </tr>
             </thead>
             <tbody>
                 {% for audit in auditorias %}
                 <tr>
-                    <td>{{ audit.fecha|date:"d/m/Y H:i" }}</td>
-                    <td><span class="badge">{{ audit.accion }}</span></td>
-                    <td>{{ audit.usuario_id }}</td>
-                    <td style="font-family: monospace; font-size: 0.8rem; color: #cbd5e1;">{{ audit.detalles }}</td>
+                    <td style="border-color: rgba(255,255,255,0.05); color: #e2e8f0;">{{ audit.fecha|date:"d/m/Y H:i" }}</td>
+                    <td style="border-color: rgba(255,255,255,0.05);"><span class="badge badge-primary">{{ audit.accion }}</span></td>
+                    <td style="border-color: rgba(255,255,255,0.05); color: #e2e8f0;">{{ audit.usuario_id }}</td>
+                    <td style="border-color: rgba(255,255,255,0.05); font-family: monospace; font-size: 0.8rem; color: #cbd5e1;">{{ audit.detalles }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-</body>
+</div>
+{% endblock %}
 
-</html>
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<style>
+body { background: radial-gradient(circle at top left, #1e1b4b, #0f172a) !important; color: #f8fafc !important; }
+.bam-body { padding: 40px; }
+.bam-header { margin-bottom: 40px; }
+.bam-header h1 {
+    font-size: 2.5rem; font-weight: 800; margin: 0;
+    background: linear-gradient(to right, #818cf8, #d946ef);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.bam-header p { color: #94a3b8; margin: 8px 0 0 0; }
+.bam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.bam-card {
+    background: rgba(30,41,59,0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 24px;
+    transition: transform 0.3s ease;
+}
+.bam-card:hover { transform: translateY(-5px); border-color: #6366f1; }
+.bam-card h3 { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0; }
+.bam-value { font-size: 2.5rem; font-weight: 800; margin: 15px 0; color: #fff; }
+.sim-tag {
+    padding: 10px; border-radius: 12px;
+    background: rgba(16,185,129,0.1); color: #10b981;
+    border: 1px solid rgba(16,185,129,0.2);
+    font-size: 0.8rem; display: flex; align-items: center;
+}
+.sim-tag.active { animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+</style>
+{% endblock %}

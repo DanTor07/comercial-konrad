@@ -1,127 +1,102 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel del Director - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; }
-        .header { background: white; padding: 1.5rem 5%; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .main { padding: 40px 5%; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #F3F4F6; }
-        th { background-color: #F9FAFB; font-weight: 600; color: #374151; }
-        .badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 500; }
-        .badge-pending { background-color: #FEF3C7; color: #92400E; }
-        .badge-approved { background-color: #D1FAE5; color: #065F46; }
-        .badge-rejected { background-color: #FEE2E2; color: #991B1B; }
-        .action-form { display: flex; gap: 0.5rem; }
-        select, input { padding: 6px; border-radius: 4px; border: 1px solid #D1D5DB; }
-        button { padding: 6px 12px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-        <h1 style="margin:0;">Dashboard del Director</h1>
-        <a href="{% url 'bam_dashboard' %}" style="background: #4F46E5; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-family: 'Outfit', sans-serif;">📊 Tablero de Control (BAM)</a>
-    </div>
-    <div class="main">
-        {% if messages %}
-        <div class="messages" style="margin-bottom: 20px;">
-            {% for message in messages %}
-            <div style="padding: 10px; border-radius: 8px; margin-bottom: 10px; 
-                 {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #F87171;
-                 {% elif message.tags == 'success' %}background: #D1FAE5; color: #065F46; border: 1px solid #34D399;
-                 {% else %}background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA;{% endif %}">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <h3>Filtrar Solicitudes</h3>
-            <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-                <div>
-                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Búsqueda (Nombre/ID)</label>
-                    <input type="text" name="q" value="{{ request.GET.q|default:'' }}" style="width: 100%;">
-                </div>
-                <div>
-                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Estado</label>
-                    <select name="estado" style="width: 100%;">
-                        <option value="">Todos</option>
-                        {% for val, label in estados %}
-                        <option value="{{ val }}" {% if request.GET.estado == val %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Desde</label>
-                    <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio|default:'' }}" style="width: 100%;">
-                </div>
-                <div>
-                    <label style="display:block; font-size: 0.8rem; margin-bottom: 4px;">Hasta</label>
-                    <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin|default:'' }}" style="width: 100%;">
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button type="submit">Aplicar Filtros</button>
-                    <a href="{% url 'dashboard_director' %}" style="padding: 6px 12px; background: #9CA3AF; color: white; text-decoration: none; border-radius: 4px;">Limpiar</a>
-                </div>
-            </form>
-        </div>
+{% extends 'base.html' %}
 
-        <h2>Listado de Solicitudes</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Nombres</th>
-                    <th>Identificación</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for s in solicitudes %}
-                <tr>
-                    <td>{{ s.fecha_creacion|date:"d/m/Y H:i" }}</td>
-                    <td>{{ s.nombres }} {{ s.apellidos }}</td>
-                    <td>{{ s.numero_identificacion }}</td>
-                    <td>
-                        <span class="badge 
-                            {% if s.estado == 'PENDIENTE' %}badge-pending
-                            {% elif s.estado == 'APROBADA' %}badge-approved
-                            {% elif s.estado == 'RECHAZADA' %}badge-rejected
-                            {% endif %}">
-                            {{ s.estado }}
-                        </span>
-                    </td>
-                    <td>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <a href="{% url 'detalle_solicitud' s.id %}" style="padding: 4px 8px; background: #10B981; color: white; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">Ver Detalle</a>
-                            {% if s.estado == 'PENDIENTE' %}
-                            <form action="{% url 'procesar_solicitud' s.id %}" method="POST" class="action-form">
-                                {% csrf_token %}
-                                <select name="decision" style="font-size: 0.8rem;">
-                                    <option value="APROBADA">Aprobar</option>
-                                    <option value="RECHAZADA">Rechazar</option>
-                                    <option value="DEVUELTA">Devolver</option>
-                                </select>
-                                <button type="submit" style="font-size: 0.8rem;">OK</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" style="text-align: center;">No se encontraron solicitudes.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p style="margin-top: 2rem;"><a href="{% url 'inicio' %}" style="color: var(--primary);">← Volver al inicio</a></p>
+{% block title %}Panel del Director - Comercial Konrad{% endblock %}
+
+{% block nav %}
+<nav class="navbar">
+    <span class="logo">Panel del Director</span>
+    <div class="nav-links">
+        <a href="{% url 'bam_dashboard' %}" class="btn-nav-primary">📊 Tablero BAM</a>
+        <a href="{% url 'inicio' %}">Inicio</a>
+        <a href="{% url 'logout' %}" class="nav-danger">Cerrar Sesión</a>
     </div>
-</body>
-</html>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div class="msg {% if message.tags == 'error' %}msg-error{% elif message.tags == 'success' %}msg-success{% else %}msg-info{% endif %}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card" style="margin-bottom: 30px;">
+        <h3 style="margin-top: 0;">Filtrar Solicitudes</h3>
+        <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: end;">
+            <div>
+                <label style="display:block; font-size: 0.8rem; margin-bottom: 4px; font-weight:600; color:var(--gray);">Búsqueda (Nombre/ID)</label>
+                <input type="text" name="q" value="{{ request.GET.q|default:'' }}">
+            </div>
+            <div>
+                <label style="display:block; font-size: 0.8rem; margin-bottom: 4px; font-weight:600; color:var(--gray);">Estado</label>
+                <select name="estado">
+                    <option value="">Todos</option>
+                    {% for val, label in estados %}
+                    <option value="{{ val }}" {% if request.GET.estado == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label style="display:block; font-size: 0.8rem; margin-bottom: 4px; font-weight:600; color:var(--gray);">Desde</label>
+                <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio|default:'' }}">
+            </div>
+            <div>
+                <label style="display:block; font-size: 0.8rem; margin-bottom: 4px; font-weight:600; color:var(--gray);">Hasta</label>
+                <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin|default:'' }}">
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                <button type="submit" class="btn btn-primary" style="padding: 10px 16px;">Aplicar</button>
+                <a href="{% url 'dashboard_director' %}" class="btn btn-gray" style="padding: 10px 16px;">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
+    <h2 style="margin-bottom: 16px;">Listado de Solicitudes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Nombres</th>
+                <th>Identificación</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in solicitudes %}
+            <tr>
+                <td>{{ s.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                <td>{{ s.nombres }} {{ s.apellidos }}</td>
+                <td>{{ s.numero_identificacion }}</td>
+                <td>
+                    <span class="badge {% if s.estado == 'PENDIENTE' %}badge-pending{% elif s.estado == 'APROBADA' %}badge-approved{% elif s.estado == 'RECHAZADA' %}badge-rejected{% else %}badge-info{% endif %}">
+                        {{ s.estado }}
+                    </span>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <a href="{% url 'detalle_solicitud' s.id %}" class="btn btn-secondary" style="padding: 5px 10px; font-size:0.8rem;">Ver Detalle</a>
+                        {% if s.estado == 'PENDIENTE' %}
+                        <form action="{% url 'procesar_solicitud' s.id %}" method="POST" style="display:flex; gap:4px;">
+                            {% csrf_token %}
+                            <select name="decision" style="padding: 5px 8px; font-size:0.8rem; border-radius:6px;">
+                                <option value="APROBADA">Aprobar</option>
+                                <option value="RECHAZADA">Rechazar</option>
+                                <option value="DEVUELTA">Devolver</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary" style="padding: 5px 10px; font-size:0.8rem;">OK</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align: center; color: var(--gray);">No se encontraron solicitudes.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

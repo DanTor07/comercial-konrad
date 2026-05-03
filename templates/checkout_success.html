@@ -1,43 +1,29 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Compra Exitosa - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4F46E5; --success: #10B981; }
-        body { font-family: 'Outfit', sans-serif; text-align: center; padding: 100px 5%; background: #F9FAFB; }
-        .card { max-width: 520px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-        .icon { font-size: 4rem; color: var(--success); margin-bottom: 20px; }
-        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; }
-        .summary-row.total { font-weight: 700; font-size: 1.1rem; color: var(--primary); border-bottom: none; margin-top: 8px; }
-        .badge { display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 20px; }
-        .btn-home { display: inline-block; padding: 12px 30px; background: var(--primary); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 24px; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="icon">✓</div>
-        <h1>¡Pago Exitoso!</h1>
-        <span class="badge">Pedido #{{ resultado.pedido_id }}</span>
-        <p>Tu pedido ha sido registrado y procesado correctamente.</p>
+{% extends 'base.html' %}
+
+{% block title %}Compra Exitosa - Comercial Konrad{% endblock %}
+
+{% block content %}
+<div class="center-page" style="padding-top: 80px;">
+    <div class="form-card" style="max-width: 520px; text-align: center;">
+        <div style="font-size: 4rem; color: var(--success); margin-bottom: 16px;">✓</div>
+        <h1 style="margin: 0 0 8px 0;">¡Pago Exitoso!</h1>
+        <span class="badge badge-approved" style="margin-bottom: 20px; display: inline-block;">Pedido #{{ resultado.pedido_id }}</span>
+        <p style="color: var(--gray);">Tu pedido ha sido registrado y procesado correctamente.</p>
 
         <div style="text-align: left; margin: 20px 0;">
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span>${{ resultado.subtotal }}</span>
-            </div>
-            <div class="summary-row">
-                <span>IVA (19%)</span>
-                <span>${{ resultado.iva }}</span>
-            </div>
-            <div class="summary-row total">
-                <span>Total pagado</span>
-                <span>${{ resultado.total }}</span>
-            </div>
+            <div class="summary-row"><span>Subtotal</span><span>${{ resultado.subtotal }}</span></div>
+            <div class="summary-row"><span>IVA (19%)</span><span>${{ resultado.iva }}</span></div>
+            <div class="summary-row summary-total"><span>Total pagado</span><span>${{ resultado.total }}</span></div>
         </div>
 
-        <a href="{% url 'catalog' %}" class="btn-home">Volver al Catálogo</a>
+        <a href="{% url 'catalog' %}" class="btn btn-primary" style="margin-top: 8px;">Volver al Catálogo</a>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; }
+.summary-total { font-weight: 700; font-size: 1.1rem; color: var(--primary); border-bottom: none; margin-top: 8px; }
+</style>
+{% endblock %}

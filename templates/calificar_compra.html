@@ -1,47 +1,26 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calificar tu Compra - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
-        body { font-family: 'Outfit', sans-serif; background: var(--light); margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .card { background: white; border-radius: 20px; padding: 48px 40px; max-width: 520px; width: 100%; box-shadow: 0 16px 48px rgba(0,0,0,0.1); text-align: center; }
-        .success-icon { font-size: 4rem; margin-bottom: 16px; }
-        h1 { margin: 0 0 8px 0; font-size: 1.6rem; color: var(--dark); }
-        p { color: #6B7280; margin-bottom: 24px; }
-        .star-row { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
-        .star-btn { font-size: 2.5rem; background: none; border: none; cursor: pointer; color: #D1D5DB; transition: color 0.15s, transform 0.15s; }
-        .star-btn:hover, .star-btn.selected { color: #FBBF24; transform: scale(1.15); }
-        .rating-label { font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-bottom: 16px; height: 22px; }
-        textarea { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 10px; font-family: 'Outfit', sans-serif; resize: vertical; font-size: 0.95rem; }
-        .btn-submit { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 20px; font-family: 'Outfit', sans-serif; }
-        .btn-skip { display: block; margin-top: 12px; color: #6B7280; text-decoration: none; font-size: 0.9rem; }
-    </style>
-</head>
-<body>
-    <div class="card">
+{% extends 'base.html' %}
+
+{% block title %}Calificar tu Compra - Comercial Konrad{% endblock %}
+
+{% block content %}
+<div class="center-page" style="padding-top: 60px;">
+    <div class="form-card" style="max-width: 520px; text-align: center;">
         {% if messages %}
         <div style="margin-bottom: 20px; text-align: left;">
             {% for message in messages %}
-            <div style="padding: 12px; border-radius: 8px; margin-bottom: 8px; background:#D1FAE5; color:#065F46; border:1px solid #34D399;">
-                {{ message }}
-            </div>
+            <div class="msg msg-success">{{ message }}</div>
             {% endfor %}
         </div>
         {% endif %}
-        <div class="success-icon">🎉</div>
-        <h1>¡Compra Confirmada!</h1>
-        <p>Tu pago fue procesado. Número de pedido: <strong>#{{ pedido.id }}</strong><br>
+
+        <div style="font-size: 4rem; margin-bottom: 16px;">🎉</div>
+        <h1 style="margin: 0 0 8px 0; font-size: 1.6rem;">¡Compra Confirmada!</h1>
+        <p style="color: var(--gray);">Tu pago fue procesado. Número de pedido: <strong>#{{ pedido.id }}</strong><br>
         Ahora puedes calificar tu experiencia con el vendedor.</p>
 
         <form method="POST" action="{% url 'calificar_transaccion' pedido.id %}">
             {% csrf_token %}
-
             <p style="font-weight:600; margin-bottom:8px;">¿Cómo calificarías al vendedor? (1 = Malo · 10 = Excelente)</p>
-
             <div class="star-row">
                 {% for i in "1234567890"|make_list %}
                 <button type="button" class="star-btn" onclick="setRating({{ forloop.counter }})" id="star-{{ forloop.counter }}">★</button>
@@ -49,28 +28,37 @@
             </div>
             <div class="rating-label" id="rating-label">Selecciona una puntuación</div>
             <input type="hidden" name="puntaje" id="puntaje-input" value="">
-
             <div style="text-align: left; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Comentarios sobre el vendedor y el servicio:</div>
             <textarea name="comentario" rows="4" placeholder="Cuéntanos tu experiencia..." required></textarea>
-
-            <button type="submit" class="btn-submit">Enviar Calificación</button>
+            <button type="submit" class="btn btn-primary btn-full" style="padding: 14px; margin-top: 20px;">Enviar Calificación</button>
         </form>
-        <a href="{% url 'catalog' %}" class="btn-skip">Omitir por ahora</a>
+        <a href="{% url 'catalog' %}" style="display: block; margin-top: 12px; color: var(--gray); text-decoration: none; font-size: 0.9rem;">Omitir por ahora</a>
     </div>
+</div>
+{% endblock %}
 
-    <script>
-        const labels = {
-            1: '😤 Muy malo', 2: '😞 Malo', 3: '😕 Regular-bajo', 4: '😐 Regular',
-            5: '🙂 Aceptable', 6: '😊 Bueno', 7: '😄 Muy bueno',
-            8: '🤩 Excelente', 9: '⭐ Sobresaliente', 10: '🏆 Perfecto'
-        };
-        function setRating(n) {
-            document.getElementById('puntaje-input').value = n;
-            document.getElementById('rating-label').textContent = n + '/10 — ' + labels[n];
-            for (let i = 1; i <= 10; i++) {
-                document.getElementById('star-' + i).classList.toggle('selected', i <= n);
-            }
-        }
-    </script>
-</body>
-</html>
+{% block extra_css %}
+<style>
+.star-row { display: flex; justify-content: center; gap: 8px; margin: 20px 0; }
+.star-btn { font-size: 2.5rem; background: none; border: none; cursor: pointer; color: #D1D5DB; transition: color 0.15s, transform 0.15s; }
+.star-btn:hover, .star-btn.selected { color: #FBBF24; transform: scale(1.15); }
+.rating-label { font-size: 0.9rem; color: var(--primary); font-weight: 600; margin-bottom: 16px; height: 22px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const labels = {
+    1: '😤 Muy malo', 2: '😞 Malo', 3: '😕 Regular-bajo', 4: '😐 Regular',
+    5: '🙂 Aceptable', 6: '😊 Bueno', 7: '😄 Muy bueno',
+    8: '🤩 Excelente', 9: '⭐ Sobresaliente', 10: '🏆 Perfecto'
+};
+function setRating(n) {
+    document.getElementById('puntaje-input').value = n;
+    document.getElementById('rating-label').textContent = n + '/10 — ' + labels[n];
+    for (let i = 1; i <= 10; i++) {
+        document.getElementById('star-' + i).classList.toggle('selected', i <= n);
+    }
+}
+</script>
+{% endblock %}

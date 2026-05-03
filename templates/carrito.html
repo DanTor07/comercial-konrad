@@ -1,168 +1,140 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu Carrito - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4F46E5; --primary-dark: #4338CA; --light: #F9FAFB; --dark: #1F2937; --gray: #6B7280; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; color: var(--dark); }
-        nav { background: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
-        nav a { text-decoration: none; color: var(--dark); }
-        .page-container { padding: 40px 5%; display: grid; grid-template-columns: 1fr 360px; gap: 2rem; max-width: 1100px; margin: 0 auto; }
-        .cart-item {
-            background: white; padding: 20px; border-radius: 14px; margin-bottom: 12px;
-            display: flex; gap: 16px; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .item-img { width: 80px; height: 80px; background: #F3F4F6; border-radius: 10px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--gray); }
-        .item-img img { width: 100%; height: 100%; object-fit: cover; }
-        .item-info { flex: 1; }
-        .item-info h3 { margin: 0 0 4px 0; font-size: 1rem; }
-        .item-info p { margin: 0; color: var(--gray); font-size: 0.85rem; }
-        .item-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: right; }
-        .remove-btn { color: #EF4444; text-decoration: none; font-size: 0.85rem; font-weight: 500; margin-top: 4px; display: block; }
-        .summary-box {
-            background: white; border-radius: 16px; padding: 28px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06); height: fit-content; position: sticky; top: 20px;
-        }
-        .summary-box h2 { margin: 0 0 20px 0; font-size: 1.1rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 12px; }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
-        .summary-row.total { font-weight: 700; font-size: 1.15rem; border-top: 2px solid #F3F4F6; padding-top: 14px; margin-top: 10px; color: var(--primary); }
-        .delivery-toggle { background: #F9FAFB; border-radius: 12px; padding: 16px; margin: 16px 0; }
-        .delivery-toggle label { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .delivery-toggle input { width: 18px; height: 18px; accent-color: var(--primary); }
-        .btn-checkout {
-            width: 100%; padding: 14px; background: var(--primary); color: white;
-            border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
-            font-family: 'Outfit', sans-serif; font-size: 1rem;
-            transition: background 0.2s; margin-top: 16px;
-        }
-        .btn-checkout:hover { background: var(--primary-dark); }
-        .empty-cart { text-align: center; padding: 60px; background: white; border-radius: 16px; }
-        .empty-cart h2 { color: var(--gray); }
-        .back-link { display: inline-block; margin-top: 16px; color: var(--primary); text-decoration: none; font-weight: 600; }
-        .qty-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-        .qty-btn { background: #F3F4F6; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem; }
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="{% url 'inicio' %}" class="logo">Comercial Konrad</a>
+{% extends 'base.html' %}
+
+{% block title %}Tu Carrito - Comercial Konrad{% endblock %}
+
+{% block nav %}
+<nav class="navbar">
+    <a href="{% url 'inicio' %}" class="logo">Comercial Konrad</a>
+    <div class="nav-links">
         <a href="{% url 'catalog' %}" style="color: var(--primary); font-weight: 600;">← Seguir comprando</a>
-    </nav>
+    </div>
+</nav>
+{% endblock %}
 
-    {% if cart_detail.items %}
-    <div class="page-container">
-        <div>
-            <h1 style="margin: 0 0 24px 0;">Tu Carrito ({{ cart_detail.items|length }} producto{{ cart_detail.items|length|pluralize }})</h1>
+{% block content %}
+{% if cart_detail.items %}
+<div class="cart-layout">
+    <div>
+        <h1 style="margin: 0 0 24px 0;">Tu Carrito ({{ cart_detail.items|length }} producto{{ cart_detail.items|length|pluralize }})</h1>
 
-            {% for item in cart_detail.items %}
-            <div class="cart-item">
-                <div class="item-img">
-                    {% if item.imagen_url %}
-                        <img src="{{ item.imagen_url }}" alt="{{ item.nombre }}">
-                    {% else %}
-                        📦
-                    {% endif %}
-                </div>
-                <div class="item-info">
-                    <h3>{{ item.nombre }}</h3>
-                    <p>{{ item.categoria }} · {{ item.marca }}</p>
-                    <div class="qty-controls">
-                        <a href="{% url 'add_to_cart_qty_dec' item.producto_id %}" class="qty-btn">−</a>
-                        <span style="font-weight:600;">{{ item.cantidad }}</span>
-                        <a href="{% url 'add_to_cart_qty_inc' item.producto_id %}" class="qty-btn">+</a>
-                    </div>
-                    <a href="{% url 'remove_from_cart' item.producto_id %}" class="remove-btn">Eliminar</a>
-                </div>
-                <div class="item-price">
-                    ${{ item.subtotal|floatformat:0 }} COP
-                    <div style="font-size:0.8rem;color:var(--gray);font-weight:400;">${{ item.precio_unitario|floatformat:0 }} c/u</div>
-                </div>
+        {% for item in cart_detail.items %}
+        <div class="cart-item">
+            <div class="item-img">
+                {% if item.imagen_url %}<img src="{{ item.imagen_url }}" alt="{{ item.nombre }}">
+                {% else %}📦{% endif %}
             </div>
-            {% endfor %}
+            <div class="item-info">
+                <h3>{{ item.nombre }}</h3>
+                <p>{{ item.categoria }} · {{ item.marca }}</p>
+                <div class="qty-controls">
+                    <a href="{% url 'add_to_cart_qty_dec' item.producto_id %}" class="qty-btn">−</a>
+                    <span style="font-weight:600;">{{ item.cantidad }}</span>
+                    <a href="{% url 'add_to_cart_qty_inc' item.producto_id %}" class="qty-btn">+</a>
+                </div>
+                <a href="{% url 'remove_from_cart' item.producto_id %}" class="remove-btn">Eliminar</a>
+            </div>
+            <div class="item-price">
+                ${{ item.subtotal|floatformat:0 }} COP
+                <div style="font-size:0.8rem;color:var(--gray);font-weight:400;">${{ item.precio_unitario|floatformat:0 }} c/u</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="summary-box">
+        <h2>Resumen del Pedido</h2>
+        <div class="summary-row"><span>Subtotal productos</span><span>${{ totales.subtotal|floatformat:0 }} COP</span></div>
+        <div class="summary-row"><span>Comisión de plataforma</span><span>${{ totales.comision|floatformat:0 }} COP</span></div>
+        {% if totales.iva > 0 %}
+        <div class="summary-row"><span>IVA ({{ totales.iva_pct|floatformat:0 }}%)</span><span>${{ totales.iva|floatformat:0 }} COP</span></div>
+        {% endif %}
+
+        <div class="delivery-toggle">
+            <label>
+                <input type="checkbox" id="domicilio-check" onchange="toggleDomicilio(this.checked)">
+                Entrega a domicilio
+            </label>
+            <div id="domicilio-info" style="display:none; margin-top:10px; font-size:0.85rem; color:var(--gray);">
+                Costo estimado basado en el peso total y tu ciudad.
+                <div style="font-weight:700; color:var(--dark); margin-top:4px;" id="domicilio-cost">+${{ totales.costo_domicilio|floatformat:0 }} COP</div>
+            </div>
         </div>
 
-        <div class="summary-box">
-            <h2>Resumen del Pedido</h2>
+        <div class="summary-row summary-total">
+            <span>TOTAL SIN DOMICILIO</span>
+            <span id="total-sin">${{ totales.total_sin_domicilio|floatformat:0 }} COP</span>
+        </div>
+        <div class="summary-row summary-total" id="total-con-row" style="display:none;">
+            <span>TOTAL CON DOMICILIO</span>
+            <span>${{ totales.total_con_domicilio|floatformat:0 }} COP</span>
+        </div>
 
-            <div class="summary-row">
-                <span>Subtotal productos</span>
-                <span>${{ totales.subtotal|floatformat:0 }} COP</span>
-            </div>
-            <div class="summary-row">
-                <span>Comisión de plataforma</span>
-                <span>${{ totales.comision|floatformat:0 }} COP</span>
-            </div>
-            {% if totales.iva > 0 %}
-            <div class="summary-row">
-                <span>IVA ({{ totales.iva_pct|floatformat:0 }}%)</span>
-                <span>${{ totales.iva|floatformat:0 }} COP</span>
-            </div>
-            {% endif %}
-
-            <div class="delivery-toggle">
-                <label>
-                    <input type="checkbox" id="domicilio-check" onchange="toggleDomicilio(this.checked)">
-                    Entrega a domicilio
+        <form method="POST" action="{% url 'checkout' %}">
+            {% csrf_token %}
+            <input type="hidden" name="con_domicilio" id="domicilio-input" value="false">
+            <div style="margin-bottom:14px;">
+                <label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:8px;">Método de pago</label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;">
+                    <input type="radio" name="metodo_pago" value="LINEA" required> 🏦 Pago en Línea (PSE)
                 </label>
-                <div id="domicilio-info" style="display:none; margin-top:10px; font-size:0.85rem; color:var(--gray);">
-                    Costo estimado basado en el peso total de tus productos y tu ciudad.
-                    <div style="font-weight:700; color:var(--dark); margin-top:4px;" id="domicilio-cost">+${{ totales.costo_domicilio|floatformat:0 }} COP</div>
-                </div>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;">
+                    <input type="radio" name="metodo_pago" value="TARJETA"> 💳 Tarjeta de Crédito
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <input type="radio" name="metodo_pago" value="CONSIGNACION"> 🧾 Consignación Bancaria
+                </label>
             </div>
-
-            <div class="summary-row total">
-                <span>TOTAL SIN DOMICILIO</span>
-                <span id="total-sin">${{ totales.total_sin_domicilio|floatformat:0 }} COP</span>
-            </div>
-            <div class="summary-row total" id="total-con-row" style="display:none;">
-                <span>TOTAL CON DOMICILIO</span>
-                <span>${{ totales.total_con_domicilio|floatformat:0 }} COP</span>
-            </div>
-
-            <form method="POST" action="{% url 'checkout' %}">
-                {% csrf_token %}
-                <input type="hidden" name="con_domicilio" id="domicilio-input" value="false">
-                <div style="margin-bottom:14px;">
-                    <label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:8px;">Método de pago</label>
-                    <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;">
-                        <input type="radio" name="metodo_pago" value="LINEA" required> 🏦 Pago en Línea (PSE)
-                    </label>
-                    <label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;">
-                        <input type="radio" name="metodo_pago" value="TARJETA"> 💳 Tarjeta de Crédito
-                    </label>
-                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                        <input type="radio" name="metodo_pago" value="CONSIGNACION"> 🧾 Consignación Bancaria
-                    </label>
-                </div>
-                <button type="submit" class="btn-checkout">Confirmar y Pagar</button>
-            </form>
-        </div>
+            <button type="submit" class="btn btn-primary btn-full" style="padding: 14px; font-size: 1rem;">Confirmar y Pagar</button>
+        </form>
     </div>
+</div>
 
-    <script>
-        function toggleDomicilio(checked) {
-            document.getElementById('domicilio-info').style.display = checked ? 'block' : 'none';
-            document.getElementById('total-sin').parentElement.style.display = checked ? 'none' : 'flex';
-            document.getElementById('total-con-row').style.display = checked ? 'flex' : 'none';
-            document.getElementById('domicilio-input').value = checked ? 'true' : 'false';
-        }
-    </script>
-
-    {% else %}
-    <div style="padding: 40px 5%;">
-        <div class="empty-cart">
-            <div style="font-size: 4rem;">🛒</div>
-            <h2>Tu carrito está vacío</h2>
-            <p style="color: var(--gray);">Explora el catálogo y añade productos que te interesen.</p>
-            <a href="{% url 'catalog' %}" class="back-link">Ir al Catálogo →</a>
-        </div>
+{% else %}
+<div style="padding: 40px 5%;">
+    <div class="card" style="max-width: 500px; margin: 0 auto; text-align: center; padding: 60px 40px;">
+        <div style="font-size: 4rem;">🛒</div>
+        <h2 style="color: var(--gray);">Tu carrito está vacío</h2>
+        <p style="color: var(--gray);">Explora el catálogo y añade productos que te interesen.</p>
+        <a href="{% url 'catalog' %}" class="btn btn-primary" style="margin-top: 16px;">Ir al Catálogo →</a>
     </div>
-    {% endif %}
-</body>
-</html>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.cart-layout { padding: 40px 5%; display: grid; grid-template-columns: 1fr 360px; gap: 2rem; max-width: 1100px; margin: 0 auto; }
+.cart-item {
+    background: white; padding: 20px; border-radius: 14px; margin-bottom: 12px;
+    display: flex; gap: 16px; align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.item-img { width: 80px; height: 80px; background: #F3F4F6; border-radius: 10px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--gray); }
+.item-img img { width: 100%; height: 100%; object-fit: cover; }
+.item-info { flex: 1; }
+.item-info h3 { margin: 0 0 4px 0; font-size: 1rem; }
+.item-info p  { margin: 0; color: var(--gray); font-size: 0.85rem; }
+.item-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); text-align: right; }
+.remove-btn { color: var(--error); text-decoration: none; font-size: 0.85rem; font-weight: 500; margin-top: 4px; display: block; }
+.qty-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.qty-btn { background: #F3F4F6; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 1rem; text-decoration: none; display: flex; align-items: center; justify-content: center; color: var(--dark); }
+.summary-box { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); height: fit-content; position: sticky; top: 72px; }
+.summary-box h2 { margin: 0 0 20px 0; font-size: 1.1rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 12px; }
+.summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
+.summary-total { font-weight: 700; font-size: 1.1rem; border-top: 2px solid #F3F4F6; padding-top: 14px; margin-top: 8px; color: var(--primary); }
+.delivery-toggle { background: var(--light); border-radius: 12px; padding: 16px; margin: 16px 0; }
+.delivery-toggle label { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.delivery-toggle input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleDomicilio(checked) {
+    document.getElementById('domicilio-info').style.display = checked ? 'block' : 'none';
+    document.getElementById('total-sin').parentElement.style.display = checked ? 'none' : 'flex';
+    document.getElementById('total-con-row').style.display = checked ? 'flex' : 'none';
+    document.getElementById('domicilio-input').value = checked ? 'true' : 'false';
+}
+</script>
+{% endblock %}

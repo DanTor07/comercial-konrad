@@ -1,19 +1,14 @@
-{% load static %}
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error | Página no encontrada</title>
-    <!-- Aquí puedes incluir tu CSS u otros archivos estáticos -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <div class="error-container">
-        <h1>¡Algo salió mal!</h1>
-        <p>No se pudo encontrar la página que estás buscando.</p>
-        <a href="{% url 'inicio' %}">Volver al inicio</a>
+{% block title %}Página no encontrada | Comercial Konrad{% endblock %}
+
+{% block content %}
+<div class="center-page" style="padding-top: 80px; text-align: center;">
+    <div class="form-card" style="max-width: 480px; text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 16px;">😕</div>
+        <h1 style="margin: 0 0 12px 0;">¡Algo salió mal!</h1>
+        <p style="color: var(--gray);">No se pudo encontrar la página que estás buscando.</p>
+        <a href="{% url 'inicio' %}" class="btn btn-primary" style="margin-top: 16px;">Volver al inicio</a>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -1,160 +1,134 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de Solicitud - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; --success: #10B981; --error: #EF4444; }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; color: var(--dark); }
-        .header { background: white; padding: 1.5rem 5%; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .main { padding: 40px 5%; max-width: 1000px; margin: 0 auto; }
-        .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
-        .label { font-size: 0.85rem; color: #6B7280; font-weight: 600; text-transform: uppercase; }
-        .value { font-size: 1.1rem; margin-top: 4px; font-weight: 500; }
-        .section-title { border-bottom: 2px solid #F3F4F6; padding-bottom: 10px; margin-bottom: 20px; color: var(--primary); display: flex; align-items: center; justify-content: space-between; }
-        .doc-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: #F9FAFB; border-radius: 8px; margin-bottom: 8px; }
-        .btn-link { color: var(--primary); text-decoration: none; font-weight: 600; }
-        .badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.9rem; }
-        .status-pill { padding: 8px 16px; border-radius: 8px; font-weight: 700; }
-        .pill-RADICADA { background: #E0E7FF; color: #3730A3; }
-        .pill-APROBADA { background: #D1FAE5; color: #065F46; }
-        .pill-RECHAZADA { background: #FEE2E2; color: #991B1B; }
-        .score-box { padding: 15px; border-radius: 12px; text-align: center; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Detalle de Solicitud #{{ solicitud.id }}</h1>
-        <a href="{% url 'dashboard_director' %}" class="btn-link">← Volver al Dashboard</a>
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Solicitud - Comercial Konrad{% endblock %}
+
+{% block nav %}
+<nav class="navbar">
+    <span class="logo">Detalle de Solicitud #{{ solicitud.id }}</span>
+    <div class="nav-links">
+        <a href="{% url 'dashboard_director' %}">← Volver al Dashboard</a>
+        <a href="{% url 'logout' %}" class="nav-danger">Cerrar Sesión</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="page-container" style="max-width: 1000px;">
+    {% if messages %}
+    <div style="margin-bottom: 20px;">
+        {% for message in messages %}
+        <div class="msg {% if message.tags == 'error' %}msg-error{% elif message.tags == 'success' %}msg-success{% else %}msg-info{% endif %}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Estado Actual -->
+    <div class="card" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <div class="meta-label">Estado de la Solicitud</div>
+            <span class="status-pill pill-{{ solicitud.estado }}" style="margin-top: 8px; display: inline-block;">
+                {{ solicitud.get_estado_display }}
+            </span>
+        </div>
+        <div style="text-align: right;">
+            <div class="meta-label">Fecha de Radicación</div>
+            <div style="font-size: 1.1rem; font-weight: 500; margin-top: 4px;">{{ solicitud.fecha_creacion|date:"d/m/Y H:i" }}</div>
+        </div>
     </div>
 
-    <div class="main">
-        {% if messages %}
-        <div class="messages" style="margin-bottom: 20px;">
-            {% for message in messages %}
-            <div style="padding: 10px; border-radius: 8px; margin-bottom: 10px; 
-                 {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #F87171;
-                 {% elif message.tags == 'success' %}background: #D1FAE5; color: #065F46; border: 1px solid #34D399;
-                 {% else %}background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA;{% endif %}">
-                {{ message }}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Información Personal -->
+        <div class="card">
+            <h3 class="section-title">Información Personal</h3>
+            <div class="info-row"><div class="meta-label">Nombre Completo</div><div>{{ solicitud.nombres }} {{ solicitud.apellidos }}</div></div>
+            <div class="info-row"><div class="meta-label">Identificación</div><div>{{ solicitud.numero_identificacion }} ({{ solicitud.get_tipo_persona_display }})</div></div>
+            <div class="info-row"><div class="meta-label">Correo y Teléfono</div><div>{{ solicitud.correo_electronico }}<br>{{ solicitud.telefono }}</div></div>
+            <div class="info-row"><div class="meta-label">Ubicación</div><div>{{ solicitud.ciudad }}, {{ solicitud.pais }}</div></div>
+        </div>
+
+        <!-- Centrales de Riesgo -->
+        <div class="card">
+            <h3 class="section-title">Centrales de Riesgo</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div style="background: #EEF2FF; padding: 15px; border-radius: 10px; text-align: center;">
+                    <div class="meta-label">DataCrédito</div>
+                    <div style="font-size: 1.5rem; color: var(--primary); font-weight: 700; margin-top: 4px;">{{ solicitud.score_datacredito|default:"N/A" }}</div>
+                </div>
+                <div style="background: #ECFDF5; padding: 15px; border-radius: 10px; text-align: center;">
+                    <div class="meta-label">CIFIN</div>
+                    <div style="font-size: 1.5rem; color: #059669; font-weight: 700; margin-top: 4px;">{{ solicitud.score_cifin|default:"N/A" }}</div>
+                </div>
             </div>
+            <div style="padding: 15px; border-radius: 12px; background: {% if solicitud.tiene_antecedentes %}#FEF2F2{% else %}#F0FDF4{% endif %};">
+                <div class="meta-label">Antecedentes Judiciales</div>
+                <div style="font-weight: 600; color: {% if solicitud.tiene_antecedentes %}var(--error){% else %}var(--success){% endif %}; margin-top: 4px;">
+                    {% if solicitud.tiene_antecedentes %}SÍ REGISTRA ANTECEDENTES{% else %}NO REGISTRA ANTECEDENTES{% endif %}
+                </div>
+                <a href="https://antecedentes.policia.gov.co:7005/WebJudicial/" target="_blank" style="color: var(--primary); font-size: 0.85rem; text-decoration: none; font-weight: 600; margin-top: 8px; display: block;">
+                    Verificar en portal Policía Nacional ↗
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Documentos -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <h3 class="section-title">Documentación Adjunta</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            {% for doc in solicitud.documentos.all %}
+            <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--light); border-radius: 8px;">
+                <div style="flex-grow: 1;">
+                    <div class="meta-label">{{ doc.tipo }}</div>
+                    <div style="font-size: 0.9rem;">Documento PDF adjunto</div>
+                </div>
+                <a href="{{ doc.archivo.url }}" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none; white-space: nowrap;">Ver PDF</a>
+            </div>
+            {% empty %}
+            <p style="color: var(--gray);">No hay documentos adjuntos.</p>
             {% endfor %}
         </div>
-        {% endif %}
-        <!-- Estado Actual -->
-        <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <div class="label">Estado de la Solicitud</div>
-                <div class="status-pill pill-{{ solicitud.estado }}" style="margin-top: 8px; display: inline-block;">
-                    {{ solicitud.get_estado_display }}
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="label">Fecha de Radicación</div>
-                <div class="value">{{ solicitud.fecha_creacion|date:"d/m/Y H:i" }}</div>
-            </div>
-        </div>
-
-        <div class="grid">
-            <!-- Información Personal -->
-            <div class="card">
-                <h3 class="section-title">Información Personal</h3>
-                <div style="margin-bottom: 15px;">
-                    <div class="label">Nombre Completo</div>
-                    <div class="value">{{ solicitud.nombres }} {{ solicitud.apellidos }}</div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <div class="label">Identificación</div>
-                    <div class="value">{{ solicitud.numero_identificacion }} ({{ solicitud.get_tipo_persona_display }})</div>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <div class="label">Correo y Teléfono</div>
-                    <div class="value">{{ solicitud.correo_electronico }}<br>{{ solicitud.telefono }}</div>
-                </div>
-                <div>
-                    <div class="label">Ubicación</div>
-                    <div class="value">{{ solicitud.ciudad }}, {{ solicitud.pais }}</div>
-                </div>
-            </div>
-
-            <!-- Centrales de Riesgo (Simulación) -->
-            <div class="card">
-                <h3 class="section-title">Centrales de Riesgo</h3>
-                <div class="grid" style="grid-template-columns: 1fr 1fr;">
-                    <div class="score-box" style="background: #EEF2FF;">
-                        <div class="label">DataCrédito</div>
-                        <div class="value" style="font-size: 1.5rem; color: #4F46E5;">{{ solicitud.score_datacredito|default:"N/A" }}</div>
-                    </div>
-                    <div class="score-box" style="background: #ECFDF5;">
-                        <div class="label">CIFIN</div>
-                        <div class="value" style="font-size: 1.5rem; color: #059669;">{{ solicitud.score_cifin|default:"N/A" }}</div>
-                    </div>
-                </div>
-                <div style="margin-top: 20px; padding: 15px; border-radius: 12px; background: {% if solicitud.tiene_antecedentes %}#FEF2F2{% else %}#F0FDF4{% endif %};">
-                    <div class="label">Antecedentes Judiciales</div>
-                    <div class="value" style="color: {% if solicitud.tiene_antecedentes %}var(--error){% else %}var(--success){% endif %};">
-                        {% if solicitud.tiene_antecedentes %}
-                            SÍ REGISTRA ANTECEDENTES
-                        {% else %}
-                            NO REGISTRA ANTECEDENTES
-                        {% endif %}
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <a href="https://antecedentes.policia.gov.co:7005/WebJudicial/" target="_blank" class="btn-link" style="font-size: 0.85rem;">
-                            Verificar en portal Policía Nacional ↗
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Documentos -->
-        <div class="card">
-            <h3 class="section-title">Documentación Adjunta</h3>
-            <div class="grid">
-                {% for doc in solicitud.documentos.all %}
-                <div class="doc-item">
-                    <div style="flex-grow: 1;">
-                        <div class="label">{{ doc.tipo }}</div>
-                        <div style="font-size: 0.9rem;">Documento PDF adjunto</div>
-                    </div>
-                    <a href="{{ doc.archivo.url }}" target="_blank" class="btn-link">Ver PDF</a>
-                </div>
-                {% empty %}
-                <p>No hay documentos adjuntos.</p>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Acciones del Director -->
-        {% if solicitud.estado == 'PENDIENTE' %}
-        <div class="card" style="border: 2px solid var(--primary);">
-            <h3 class="section-title">Tomar Decisión</h3>
-            <form action="{% url 'procesar_solicitud' solicitud.id %}" method="POST">
-                {% csrf_token %}
-                <div style="margin-bottom: 1rem;">
-                    <label class="label">Comentarios / Observaciones</label>
-                    <textarea name="comentarios" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #D1D5DB; margin-top: 8px;" rows="4" placeholder="Escriba aquí los motivos de su decisión..."></textarea>
-                </div>
-                <div style="display: flex; gap: 1rem;">
-                    <button type="submit" name="decision" value="APROBADA" style="flex: 1; padding: 12px; background: var(--success); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">APROBAR</button>
-                    <button type="submit" name="decision" value="DEVUELTA" style="flex: 1; padding: 12px; background: #F59E0B; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">DEVOLVER</button>
-                    <button type="submit" name="decision" value="RECHAZADA" style="flex: 1; padding: 12px; background: var(--error); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">RECHAZAR</button>
-                </div>
-            </form>
-        </div>
-        {% else %}
-        <div class="card">
-            <h3 class="section-title">Historial de Decisión</h3>
-            <div class="label">Comentarios del Director</div>
-            <div class="value" style="background: #F9FAFB; padding: 15px; border-radius: 8px; margin-top: 8px;">
-                {{ solicitud.comentarios_director|default:"Sin comentarios." }}
-            </div>
-        </div>
-        {% endif %}
     </div>
-</body>
-</html>
+
+    <!-- Decisión -->
+    {% if solicitud.estado == 'PENDIENTE' %}
+    <div class="card" style="border: 2px solid var(--primary);">
+        <h3 class="section-title">Tomar Decisión</h3>
+        <form action="{% url 'procesar_solicitud' solicitud.id %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Comentarios / Observaciones</label>
+                <textarea name="comentarios" rows="4" placeholder="Escriba aquí los motivos de su decisión..."></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" name="decision" value="APROBADA" class="btn btn-secondary" style="flex:1; padding:12px;">APROBAR</button>
+                <button type="submit" name="decision" value="DEVUELTA" class="btn" style="flex:1; padding:12px; background: var(--accent); color: white;">DEVOLVER</button>
+                <button type="submit" name="decision" value="RECHAZADA" class="btn btn-danger" style="flex:1; padding:12px;">RECHAZAR</button>
+            </div>
+        </form>
+    </div>
+    {% else %}
+    <div class="card">
+        <h3 class="section-title">Historial de Decisión</h3>
+        <div class="meta-label">Comentarios del Director</div>
+        <div style="background: var(--light); padding: 15px; border-radius: 8px; margin-top: 8px; font-weight: 500;">
+            {{ solicitud.comentarios_director|default:"Sin comentarios." }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.meta-label { font-size: 0.85rem; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.section-title { border-bottom: 2px solid #F3F4F6; padding-bottom: 10px; margin: 0 0 20px 0; color: var(--primary); font-size: 1rem; }
+.info-row { margin-bottom: 14px; }
+.info-row > div:last-child { font-weight: 500; margin-top: 3px; }
+.status-pill { padding: 8px 16px; border-radius: 8px; font-weight: 700; }
+.pill-RADICADA   { background: #E0E7FF; color: #3730A3; }
+.pill-APROBADA   { background: #D1FAE5; color: #065F46; }
+.pill-RECHAZADA  { background: #FEE2E2; color: #991B1B; }
+.pill-PENDIENTE  { background: #FEF3C7; color: #92400E; }
+.pill-DEVUELTA   { background: #FEF3C7; color: #92400E; }
+</style>
+{% endblock %}

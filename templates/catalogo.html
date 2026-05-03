@@ -1,230 +1,165 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Productos - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4F46E5; --primary-dark: #4338CA; --light: #F9FAFB; --dark: #1F2937; --gray: #6B7280; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--light); margin: 0; color: var(--dark); }
-        nav {
-            background: white;
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
-        .nav-links { display: flex; gap: 1rem; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--dark); font-weight: 500; padding: 8px 16px; border-radius: 8px; transition: background 0.2s; }
-        .nav-links a:hover { background: #F3F4F6; }
-        .cart-badge { background: var(--primary); color: white; padding: 6px 14px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; }
-        .container { padding: 30px 5%; display: grid; grid-template-columns: 260px 1fr; gap: 2rem; }
-        .filters {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            height: fit-content;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            position: sticky;
-            top: 80px;
-        }
-        .filters h3 { margin: 0 0 16px 0; color: var(--dark); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
-        .filter-group { margin-bottom: 20px; }
-        .filter-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
-        .filter-group input, .filter-group select {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.9rem;
-        }
-        .filter-group input:focus, .filter-group select:focus { outline: none; border-color: var(--primary); }
-        .price-range { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-filter { width: 100%; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif; margin-top: 8px; }
-        .btn-clear { width: 100%; padding: 8px; background: white; color: var(--gray); border: 1px solid #E5E7EB; border-radius: 8px; font-weight: 500; cursor: pointer; font-family: 'Outfit', sans-serif; margin-top: 6px; }
-        .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
-        .product-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            transition: transform 0.3s, box-shadow 0.3s;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
-        .product-img {
-            height: 200px;
-            background: linear-gradient(135deg, #E5E7EB, #F3F4F6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #9CA3AF;
-            font-size: 0.85rem;
-            overflow: hidden;
-        }
-        .product-img img { width: 100%; height: 100%; object-fit: cover; }
-        .product-info { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
-        .product-category { font-size: 0.75rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-        .product-info h3 { margin: 0 0 4px 0; font-size: 1rem; color: var(--dark); line-height: 1.3; }
-        .product-characteristics { font-size: 0.82rem; color: var(--gray); margin: 4px 0 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
-        .product-price { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin: 8px 0; }
-        .product-actions { display: flex; gap: 8px; }
-        .btn-detail { flex: 1; padding: 8px; background: white; color: var(--primary); border: 2px solid var(--primary); border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; text-decoration: none; text-align: center; transition: all 0.2s; }
-        .btn-detail:hover { background: var(--primary); color: white; }
-        .btn-add { flex: 1; padding: 8px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
-        .btn-add:hover { background: var(--primary-dark); }
-        .results-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .results-count { color: var(--gray); font-size: 0.9rem; }
-        .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 0; color: var(--gray); }
-        .empty-state h3 { font-size: 1.5rem; margin-bottom: 8px; }
-        .register-banner {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 14px 20px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .register-banner a { color: white; font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; }
-    </style>
-</head>
-<body>
-    <nav>
-        <a href="{% url 'inicio' %}" class="logo">Comercial Konrad</a>
-        <div class="nav-links">
-            {% if not user.is_authenticated %}
-                <a href="{% url 'registrar_comprador' %}">Registrarse</a>
-                <a href="{% url 'login' %}">Iniciar Sesión</a>
-            {% else %}
-                <a href="{% url 'inicio' %}">Inicio</a>
-                {% if user.is_staff or user.is_superuser %}
-                    <a href="{% url 'dashboard_director' %}">Panel Director</a>
-                {% endif %}
-                {% if user.vendedor_profile %}
-                    <a href="{% url 'vendedor_dashboard' %}">Mi Portal</a>
-                {% endif %}
-                <a href="{% url 'logout' %}">Cerrar Sesión</a>
-            {% endif %}
-            <a href="{% url 'view_cart' %}" class="cart-badge">🛒 Carrito ({{ request.session.cart.items|length|default:0 }})</a>
-        </div>
-    </nav>
+{% extends 'base.html' %}
 
-    <div style="padding: 0 5%; margin-top: 24px;">
-        {% if not user.is_authenticated %}
-        <div class="register-banner">
-            <span>🛍️ ¡Regístrate para poder agregar productos al carrito y comprar!</span>
-            <a href="{% url 'registrar_comprador' %}">Crear cuenta gratis →</a>
-        </div>
-        {% endif %}
+{% block title %}Catálogo de Productos - Comercial Konrad{% endblock %}
 
-        {% if messages %}
-        <div style="margin-bottom: 16px;">
-            {% for message in messages %}
-            <div style="padding: 12px; border-radius: 8px; margin-bottom: 8px;
-                 {% if message.tags == 'error' %}background:#FEE2E2;color:#991B1B;border:1px solid #F87171;
-                 {% else %}background:#D1FAE5;color:#065F46;border:1px solid #34D399;{% endif %}">
-                {{ message }}
+{% block content %}
+<div style="padding: 0 5%; margin-top: 24px;">
+    {% if not user.is_authenticated %}
+    <div class="register-banner">
+        <span>🛍️ ¡Regístrate para poder agregar productos al carrito y comprar!</span>
+        <a href="{% url 'registrar_comprador' %}">Crear cuenta gratis →</a>
+    </div>
+    {% endif %}
+
+    {% if messages %}
+    <div style="margin-bottom: 16px;">
+        {% for message in messages %}
+        <div class="msg {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<div class="catalog-layout">
+    <aside class="filters">
+        <form method="GET">
+            <h3>Filtros</h3>
+            <div class="filter-group">
+                <label>Nombre del producto</label>
+                <input type="text" name="q" placeholder="Buscar..." value="{{ filtros_actuales.q|default:'' }}">
+            </div>
+            <div class="filter-group">
+                <label>Categoría</label>
+                <select name="categoria">
+                    <option value="">Todas</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if filtros_actuales.categoria == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Subcategoría</label>
+                <input type="text" name="subcategoria" placeholder="Ej. Camisetas" value="{{ filtros_actuales.subcategoria|default:'' }}">
+            </div>
+            <div class="filter-group">
+                <label>Rango de Precio (COP)</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <input type="number" name="precio_min" placeholder="Mín." value="{{ filtros_actuales.precio_min|default:'' }}">
+                    <input type="number" name="precio_max" placeholder="Máx." value="{{ filtros_actuales.precio_max|default:'' }}">
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Palabra en Características</label>
+                <input type="text" name="caracteristica" placeholder="Ej. resistente" value="{{ filtros_actuales.caracteristica|default:'' }}">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Aplicar Filtros</button>
+            <a href="{% url 'catalog' %}" style="display:block; margin-top: 8px;">
+                <button type="button" class="btn btn-gray btn-full">Limpiar Filtros</button>
+            </a>
+        </form>
+    </aside>
+
+    <main>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0;">Productos</h2>
+            <span style="color: var(--gray); font-size: 0.9rem;">{{ productos.count }} resultado{{ productos.count|pluralize }}</span>
+        </div>
+
+        <div class="products-grid">
+            {% for product in productos %}
+            <div class="product-card">
+                <div class="product-img">
+                    {% with product.imagenes.first as img %}
+                        {% if img %}<img src="{{ img.imagen.url }}" alt="{{ product.nombre }}">
+                        {% else %}📦 Sin imagen{% endif %}
+                    {% endwith %}
+                </div>
+                <div class="product-info">
+                    <div class="product-category">{{ product.categoria.nombre }}</div>
+                    <h3>{{ product.nombre }}</h3>
+                    <p class="product-chars">{{ product.caracteristicas }}</p>
+                    <div class="product-price">${{ product.valor_unitario|floatformat:0 }} COP</div>
+                    <div class="product-actions">
+                        <a href="{% url 'detalle_producto' product.id %}" class="btn btn-outline" style="flex:1; padding: 8px; font-size:0.85rem;">Ver Detalle</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary" style="flex:1; padding: 8px; font-size:0.85rem;">+ Carrito</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary" style="flex:1; padding: 8px; font-size:0.85rem;">Inicia sesión</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 0; color: var(--gray);">
+                <h3>No se encontraron productos</h3>
+                <p>Intenta con otros filtros de búsqueda.</p>
             </div>
             {% endfor %}
         </div>
-        {% endif %}
-    </div>
+    </main>
+</div>
+{% endblock %}
 
-    <div class="container">
-        <aside class="filters">
-            <form method="GET">
-                <h3>Filtros</h3>
-
-                <div class="filter-group">
-                    <label>Nombre del producto</label>
-                    <input type="text" name="q" placeholder="Buscar..." value="{{ filtros_actuales.q|default:'' }}">
-                </div>
-
-                <div class="filter-group">
-                    <label>Categoría</label>
-                    <select name="categoria">
-                        <option value="">Todas</option>
-                        {% for cat in categorias %}
-                        <option value="{{ cat.id }}" {% if filtros_actuales.categoria == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Subcategoría</label>
-                    <input type="text" name="subcategoria" placeholder="Ej. Camisetas" value="{{ filtros_actuales.subcategoria|default:'' }}">
-                </div>
-
-                <div class="filter-group">
-                    <label>Rango de Precio (COP)</label>
-                    <div class="price-range">
-                        <input type="number" name="precio_min" placeholder="Mín." value="{{ filtros_actuales.precio_min|default:'' }}">
-                        <input type="number" name="precio_max" placeholder="Máx." value="{{ filtros_actuales.precio_max|default:'' }}">
-                    </div>
-                </div>
-
-                <div class="filter-group">
-                    <label>Palabra en Características</label>
-                    <input type="text" name="caracteristica" placeholder="Ej. resistente" value="{{ filtros_actuales.caracteristica|default:'' }}">
-                </div>
-
-                <button type="submit" class="btn-filter">Aplicar Filtros</button>
-                <a href="{% url 'catalog' %}" style="display:block;"><button type="button" class="btn-clear">Limpiar Filtros</button></a>
-            </form>
-        </aside>
-
-        <main>
-            <div class="results-header">
-                <h2 style="margin: 0;">Productos</h2>
-                <span class="results-count">{{ productos.count }} resultado{{ productos.count|pluralize }}</span>
-            </div>
-
-            <div class="catalog">
-                {% for product in productos %}
-                <div class="product-card">
-                    <div class="product-img">
-                        {% with product.imagenes.first as img %}
-                            {% if img %}
-                                <img src="{{ img.imagen.url }}" alt="{{ product.nombre }}">
-                            {% else %}
-                                📦 Sin imagen
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                    <div class="product-info">
-                        <div class="product-category">{{ product.categoria.nombre }}</div>
-                        <h3>{{ product.nombre }}</h3>
-                        <p class="product-characteristics">{{ product.caracteristicas }}</p>
-                        <div class="product-price">${{ product.valor_unitario|floatformat:0 }} COP</div>
-                        <div class="product-actions">
-                            <a href="{% url 'detalle_producto' product.id %}" class="btn-detail">Ver Detalle</a>
-                            {% if user.is_authenticated %}
-                                <a href="{% url 'add_to_cart' product.id %}" class="btn-add">+ Carrito</a>
-                            {% else %}
-                                <a href="{% url 'login' %}" class="btn-add">Inicia sesión</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="empty-state">
-                    <h3>No se encontraron productos</h3>
-                    <p>Intenta con otros filtros de búsqueda.</p>
-                </div>
-                {% endfor %}
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+{% block extra_css %}
+<style>
+.catalog-layout {
+    padding: 24px 5%;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2rem;
+}
+.filters {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    height: fit-content;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 72px;
+}
+.filters h3 { margin: 0 0 16px 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.filter-group { margin-bottom: 18px; }
+.filter-group label { font-size: 0.85rem; font-weight: 600; color: var(--gray); margin-bottom: 6px; display: block; }
+.register-banner {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 14px 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.register-banner a { color: white; font-weight: 700; text-decoration: none; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 8px; }
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.5rem; }
+.product-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+.product-card:hover { transform: translateY(-6px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
+.product-img {
+    height: 200px;
+    background: linear-gradient(135deg, #E5E7EB, #F3F4F6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray);
+    font-size: 0.85rem;
+    overflow: hidden;
+}
+.product-img img { width: 100%; height: 100%; object-fit: cover; }
+.product-info { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
+.product-category { font-size: 0.75rem; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.product-info h3 { margin: 0 0 4px 0; font-size: 1rem; color: var(--dark); line-height: 1.3; }
+.product-chars { font-size: 0.82rem; color: var(--gray); margin: 4px 0 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
+.product-price { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin: 8px 0; }
+.product-actions { display: flex; gap: 8px; }
+</style>
+{% endblock %}

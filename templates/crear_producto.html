@@ -1,59 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Producto - Comercial Konrad</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #4F46E5; --light: #F9FAFB; --dark: #1F2937; }
-        body { font-family: 'Outfit', sans-serif; background-color: var(--light); padding: 40px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        .form-control, .form-select { width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 8px; box-sizing: border-box; }
-        .btn-submit { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Publicar Nuevo Producto</h1>
+{% extends 'base.html' %}
+
+{% block title %}Crear Producto - Comercial Konrad{% endblock %}
+
+{% block content %}
+<div class="center-page">
+    <div class="form-card" style="max-width: 820px;">
+        <h1 style="margin: 0 0 24px 0;">Publicar Nuevo Producto</h1>
+
         {% if messages %}
-            <div style="margin-bottom: 20px;">
-                {% for message in messages %}
-                <div style="padding: 10px; border-radius: 8px; margin-bottom: 10px; 
-                     {% if message.tags == 'error' %}background: #FEE2E2; color: #991B1B; border: 1px solid #F87171;
-                     {% else %}background: #DBEAFE; color: #1E40AF; border: 1px solid #60A5FA;{% endif %}">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
+        <div style="margin-bottom: 20px;">
+            {% for message in messages %}
+            <div class="msg {% if message.tags == 'error' %}msg-error{% else %}msg-info{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
         {% endif %}
 
         {% if form.non_field_errors %}
-            <div style="color: red; margin-bottom: 1rem;">
-                {{ form.non_field_errors }}
-            </div>
+        <div class="msg msg-error" style="margin-bottom: 16px;">{{ form.non_field_errors }}</div>
         {% endif %}
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 {% for field in form %}
-                    <div class="form-group" {% if field.name == 'caracteristicas' or field.name == 'imagenes_producto' %}style="grid-column: 1 / -1;"{% endif %}>
-                        <label>{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div style="color: red; font-size: 0.85rem; margin-top: 5px;">
-                                {{ field.errors|striptags }}
-                            </div>
-                        {% endif %}
-                    </div>
+                <div class="form-group" {% if field.name == 'caracteristicas' or field.name == 'imagenes_producto' %}style="grid-column: 1 / -1;"{% endif %}>
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div style="color: var(--error); font-size: 0.85rem; margin-top: 5px;">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
                 {% endfor %}
             </div>
-            <button type="submit" class="btn-submit">Publicar Producto</button>
+            <button type="submit" class="btn btn-primary" style="margin-top: 16px; padding: 12px 28px;">Publicar Producto</button>
         </form>
-        <p style="margin-top: 1.5rem;"><a href="{% url 'vendedor_dashboard' %}" style="color: var(--primary);">← Volver al Portal del Vendedor</a></p>
+
+        <p style="margin-top: 1.5rem;">
+            <a href="{% url 'vendedor_dashboard' %}" style="color: var(--primary);">← Volver al Portal del Vendedor</a>
+        </p>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
